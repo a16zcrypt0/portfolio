@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="sky" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>a16zcrypt0 — Tech · AI · Cybersecurity</title>
+  <meta name="description" content="Independent security researcher — Web3, DeFi, offensive security." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* === CSS VARIABLES (Theme + Accent) === */
+    :root {
+      /* defaults: dark + sky */
+      --bg-primary: #070B14;
+      --bg-secondary: #0C1220;
+      --bg-card: rgba(15, 23, 42, 0.5);
+      --bg-card-hover: rgba(15, 23, 42, 0.65);
+      --bg-glass: rgba(15, 23, 42, 0.35);
+      --border-color: rgba(255,255,255,0.05);
+      --border-accent: rgba(56,189,248,0.2);
+      --text-primary: #E2E8F0;
+      --text-secondary: #94A3B8;
+      --accent: #38bdf8;
+      --accent-dark: #0284c7;
+      --accent-light: rgba(56,189,248,0.1);
+      --accent-glow: rgba(56,189,248,0.08);
+      --accent-gradient: linear-gradient(135deg, rgba(56,189,248,0.3), rgba(20,184,166,0.1), transparent);
+    }
+    [data-theme="light"] {
+      --bg-primary: #F8FAFC;
+      --bg-secondary: #F1F5F9;
+      --bg-card: rgba(255,255,255,0.7);
+      --bg-card-hover: rgba(255,255,255,0.85);
+      --bg-glass: rgba(255,255,255,0.5);
+      --border-color: rgba(0,0,0,0.06);
+      --border-accent: rgba(56,189,248,0.3);
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      --accent: #0284c7;
+      --accent-dark: #0369a1;
+      --accent-light: rgba(2,132,199,0.08);
+      --accent-glow: rgba(2,132,199,0.06);
+    }
+    [data-accent="teal"] {
+      --accent: #14b8a6;
+      --accent-dark: #0d9488;
+      --border-accent: rgba(20,184,166,0.2);
+      --accent-light: rgba(20,184,166,0.1);
+      --accent-glow: rgba(20,184,166,0.08);
+      --accent-gradient: linear-gradient(135deg, rgba(20,184,166,0.3), rgba(56,189,248,0.1), transparent);
+    }
+    [data-accent="violet"] {
+      --accent: #818cf8;
+      --accent-dark: #6366f1;
+      --border-accent: rgba(129,140,248,0.2);
+      --accent-light: rgba(129,140,248,0.1);
+      --accent-glow: rgba(129,140,248,0.08);
+      --accent-gradient: linear-gradient(135deg, rgba(129,140,248,0.3), rgba(99,102,241,0.1), transparent);
+    }
+    [data-accent="emerald"] {
+      --accent: #34d399;
+      --accent-dark: #059669;
+      --border-accent: rgba(52,211,153,0.2);
+      --accent-light: rgba(52,211,153,0.1);
+      --accent-glow: rgba(52,211,153,0.08);
+      --accent-gradient: linear-gradient(135deg, rgba(52,211,153,0.3), rgba(20,184,166,0.1), transparent);
+    }
+    /* apply variables */
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .mesh-bg {
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, var(--accent-glow) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 80%, rgba(20,184,166,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, var(--accent-glow) 0%, transparent 50%),
+        var(--bg-primary);
+      background-attachment: fixed;
+    }
+    .glass { background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-color); }
+    .glass-light { background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .gradient-border::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: inherit; padding: 1px;
+      background: var(--accent-gradient);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none;
+    }
+    .skill-tag { transition: all 0.2s ease; }
+    .skill-tag:hover { background: var(--accent-light); color: var(--accent); transform: translateY(-1px); }
+    .glow-line { height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    ::selection { background: var(--accent-light); color: var(--text-primary); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-light); }
+    .gradient-text { background: linear-gradient(135deg, var(--accent), #14b8a6, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .accent-border { border-color: var(--border-accent); }
+    .accent-bg { background: var(--accent-light); }
+    .accent-text { color: var(--accent); }
+    .accent-btn {
+      background: var(--accent-light); color: var(--accent);
+      border: 1px solid var(--border-accent);
+      transition: all 0.3s ease;
+    }
+    .accent-btn:hover { background: color-mix(in srgb, var(--accent-light) 80%, var(--accent)); }
+    .theme-transition * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+    .accent-dot { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+    .accent-dot.active { border-color: var(--text-primary); transform: scale(1.15); }
+    .accent-dot:hover { transform: scale(1.1); }
+    .form-input {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: var(--text-primary); border-radius: 0.75rem; padding: 0.75rem 1rem;
+      font-size: 0.875rem; transition: border-color 0.2s; width: 100%;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+    .repo-skeleton { animation: pulse-glow 2s infinite; }
+    @keyframes pulse-glow { 0%,100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+    /* preview-link */
+    .preview-link { position: relative; display: inline-block; }
+    .preview-link::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px;
+      background: var(--accent); transition: width 0.3s;
+    }
+    .preview-link:hover::after { width: 100%; }
+  </style>
+</head>
+<body class="mesh-bg min-h-screen antialiased">
+  <!-- HEADER -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass border-b" style="border-color: var(--border-color);">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-lg accent-bg accent-border flex items-center justify-center text-xs font-bold accent-text font-mono">AZ</div>
+        <span class="text-sm font-medium" style="color:var(--text-primary);">a16zcrypt0</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-8 text-sm" style="color:var(--text-secondary);">
+        <a href="#hero" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Home</a>
+        <a href="#dashboard" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Dashboard</a>
+        <a href="#writeups" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Writeups</a>
+        <a href="#skills" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Skills</a>
+        <a href="#contact" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Contact</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors" style="color:var(--text-secondary);" onclick="toggleTheme()">
+          <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+        </button>
+        <!-- Accent Picker -->
+        <div class="relative">
+          <button id="accent-btn" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors" style="color:var(--text-secondary);" onclick="toggleAccentPicker()">
+            <i data-lucide="palette" class="w-4 h-4"></i>
+          </button>
+          <div id="accent-picker" class="absolute right-0 top-full mt-2 glass rounded-xl p-3 hidden" style="min-width:160px;">
+            <div class="flex gap-2 justify-center">
+              <div class="accent-dot active" style="background:#38bdf8;" onclick="setAccent('sky')" title="Sky"></div>
+              <div class="accent-dot" style="background:#14b8a6;" onclick="setAccent('teal')" title="Teal"></div>
+              <div class="accent-dot" style="background:#818cf8;" onclick="setAccent('violet')" title="Violet"></div>
+              <div class="accent-dot" style="background:#34d399;" onclick="setAccent('emerald')" title="Emerald"></div>
+            </div>
+          </div>
+        </div>
+        <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors" style="color:var(--text-secondary);">
+          <i data-lucide="github" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section id="hero" class="min-h-screen flex items-center relative pt-16">
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px]" style="background:var(--accent-glow);"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-[100px]" style="background:rgba(20,184,166,0.03);"></div>
+      </div>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div class="space-y-8" style="animation: slideUp 0.8s ease-out;">
+            <style>@keyframes slideUp {0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}</style>
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+              <span>Active / Security Research</span>
+            </div>
+            <div>
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
+                <span style="color:var(--text-primary);">Building at the intersection of</span>
+                <br />
+                <span class="gradient-text">Tech · AI · Cybersecurity</span>
+              </h1>
+              <p class="mt-6 text-base sm:text-lg leading-relaxed max-w-xl" style="color:var(--text-secondary);">
+                Independent security researcher focused on Web3, DeFi, and offensive security.
+                Smart contract auditing, exploit development, and infrastructure that scales.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-4">
+              <a href="#dashboard" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl accent-btn font-medium text-sm">
+                Explore Dashboard
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+              <a href="#contact" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm" style="border:1px solid var(--border-color);color:var(--text-secondary);" onmouseover="this.style.borderColor='var(--border-accent)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                Get in Touch
+              </a>
+            </div>
+            <div class="flex flex-wrap gap-8 pt-4">
+              <div><div class="text-lg font-semibold font-mono" style="color:var(--text-primary);">5+</div><div class="text-xs mt-0.5" style="color:var(--text-secondary);">Years Research</div></div>
+              <div><div class="text-lg font-semibold font-mono accent-text">15+</div><div class="text-xs mt-0.5" style="color:var(--text-secondary);">Protocols Audited</div></div>
+              <div><div class="text-lg font-semibold font-mono" style="color:#14b8a6;">50+</div><div class="text-xs mt-0.5" style="color:var(--text-secondary);">CVEs & Findings</div></div>
+            </div>
+          </div>
+          <div class="hidden lg:block">
+            <div class="glass-card rounded-2xl overflow-hidden gradient-border">
+              <div class="flex items-center gap-2 px-4 py-3 border-b" style="border-color:var(--border-color);">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-400/60"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/60"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-400/60"></span>
+                <span class="ml-2 text-xs font-mono" style="color:var(--text-secondary);">~/terminal — zsh</span>
+              </div>
+              <div class="p-5 font-mono text-xs leading-relaxed">
+                <div style="color:rgba(52,211,153,0.7);"># security research terminal</div>
+                <div class="mt-2"><span class="accent-text">superagent@a16z</span><span style="color:var(--text-secondary);">:</span><span style="color:#14b8a6;">~</span><span style="color:var(--text-secondary);">$</span> ./scan --target=portfolio</div>
+                <div style="color:rgba(52,211,153,0.7);margin-top:4px;">[✓] Target acquired: fully secured</div>
+                <div style="color:rgba(52,211,153,0.7);">[✓] Vulnerability scan: 0 critical, 0 high</div>
+                <div style="color:rgba(52,211,153,0.7);">[✓] Deploying frontend...</div>
+                <div class="accent-text mt-1">→ Deployment live at vercel.app</div>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:var(--text-secondary);">Solidity</span>
+                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:var(--accent);">Rust</span>
+                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:#14b8a6;">TypeScript</span>
+                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:#34d399;">Python</span>
+                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:var(--text-secondary);">Go</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="py-20 lg:py-28">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+            <i data-lucide="activity" class="w-3 h-3"></i>
+            <span>Live Dashboard</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Real-time Intelligence</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Live metrics from your browsing session — network, environment, and conditions.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 lg:gap-6">
+          <!-- Weather -->
+          <div id="weather-widget" class="glass-card rounded-xl p-5 gradient-border">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="cloud-sun" class="w-4 h-4 accent-text widget-icon"></i>
+                <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Weather</span>
+              </div>
+              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">OPEN-METEO</span>
+            </div>
+            <div id="weather-content">
+              <div class="flex items-center gap-4">
+                <div id="weather-icon" class="text-3xl">🌤️</div>
+                <div>
+                  <div id="weather-temp" class="text-2xl font-bold font-mono" style="color:var(--text-primary);">--°C</div>
+                  <div id="weather-desc" class="text-xs mt-0.5" style="color:var(--text-secondary);">Loading...</div>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 mt-3">
+                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-humidity" class="text-xs font-mono" style="color:var(--text-primary);">--%</div><div class="text-[10px] mt-0.5" style="color:var(--text-secondary);">Humidity</div></div>
+                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-wind" class="text-xs font-mono" style="color:var(--text-primary);">-- km/h</div><div class="text-[10px] mt-0.5" style="color:var(--text-secondary);">Wind</div></div>
+                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-location" class="text-xs font-mono" style="color:var(--text-primary);">--</div><div class="text-[10px] mt-0.5" style="color:var(--text-secondary);">Location</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Network -->
+          <div id="network-widget" class="glass-card rounded-xl p-5 gradient-border">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="activity" class="w-4 h-4" style="color:#14b8a6;"></i>
+                <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Visitor</span>
+              </div>
+              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">ip-api.com</span>
+            </div>
+            <div id="network-content" class="space-y-2.5">
+              <div class="flex items-center gap-3 pb-2.5 border-b" style="border-color:var(--border-color);">
+                <div class="w-8 h-8 rounded-lg" style="background:rgba(20,184,166,0.1);display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="globe" class="w-4 h-4" style="color:#14b8a6;"></i>
+                </div>
+                <div>
+                  <div id="network-ip" class="text-sm font-mono" style="color:var(--text-primary);">Loading...</div>
+                  <div class="text-[10px]" style="color:var(--text-secondary);">IPv4 Address</div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5">
+                <div class="glass-light rounded-lg p-2"><div id="network-isp" class="text-xs font-mono truncate" style="color:var(--text-primary);">--</div><div class="text-[10px]" style="color:var(--text-secondary);">ISP</div></div>
+                <div class="glass-light rounded-lg p-2"><div id="network-country" class="text-xs font-mono truncate" style="color:var(--text-primary);">--</div><div class="text-[10px]" style="color:var(--text-secondary);">Location</div></div>
+              </div>
+              <div class="glass-light rounded-lg p-2 flex items-center gap-2">
+                <i data-lucide="monitor" class="w-3 h-3 shrink-0" style="color:var(--text-secondary);"></i>
+                <div class="flex-1 min-w-0"><div id="network-browser" class="text-xs font-mono truncate" style="color:var(--text-secondary);">--</div><div class="text-[10px]" style="color:var(--text-secondary);opacity:0.6;">Browser / OS</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visit Counter -->
+          <div id="counter-widget" class="glass-card rounded-xl p-5 gradient-border">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-4 h-4" style="color:#818cf8;"></i>
+                <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Traffic</span>
+              </div>
+              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">countapi</span>
+            </div>
+            <div id="counter-content" class="flex flex-col items-center justify-center py-3">
+              <div class="w-10 h-10 rounded-lg" style="background:rgba(129,140,248,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
+                <i data-lucide="eye" class="w-5 h-5" style="color:#818cf8;"></i>
+              </div>
+              <div id="counter-value" class="text-3xl font-bold font-mono" style="color:var(--text-primary);">---</div>
+              <div class="text-xs mt-1" style="color:var(--text-secondary);">Total Visits</div>
+              <div id="counter-today" class="text-xs font-mono mt-2" style="color:var(--text-secondary);opacity:0.6;">Today: --</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WRITEUPS / BLOG -->
+    <section id="writeups" class="py-20 lg:py-28 relative">
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 rounded-full blur-[100px]" style="background:var(--accent-glow);"></div>
+      </div>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+            <i data-lucide="file-text" class="w-3 h-3"></i>
+            <span>Research</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Security Writeups</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Technical deep-dives into vulnerabilities, exploits, and blockchain security research.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-lg">🔴</span>
+              <span class="text-sm font-semibold" style="color:var(--text-primary);">Critical Reentrancy in DeFi</span>
+            </div>
+            <p class="text-xs leading-relaxed" style="color:var(--text-secondary);">How a single-function reentrancy bypassed CEI pattern in a major lending protocol — full PoC breakdown.</p>
+            <div class="flex items-center justify-between mt-4 text-[10px] font-mono">
+              <span style="color:var(--accent);">Read More →</span>
+              <span style="color:var(--text-secondary);opacity:0.5;">2026</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-lg">🟠</span>
+              <span class="text-sm font-semibold" style="color:var(--text-primary);">Oracle Manipulation 101</span>
+            </div>
+            <p class="text-xs leading-relaxed" style="color:var(--text-secondary);">Flash loan powered oracle manipulation from theory to execution — TWAP vs spot price analysis.</p>
+            <div class="flex items-center justify-between mt-4 text-[10px] font-mono">
+              <span style="color:var(--accent);">Read More →</span>
+              <span style="color:var(--text-secondary);opacity:0.5;">2026</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-lg">🔵</span>
+              <span class="text-sm font-semibold" style="color:var(--text-primary);">Cross-chain Bridge Attacks</span>
+            </div>
+            <p class="text-xs leading-relaxed" style="color:var(--text-secondary);">Analyzing message validation gaps in cross-chain bridges — from wormhole-style to custom relayers.</p>
+            <div class="flex items-center justify-between mt-4 text-[10px] font-mono">
+              <span style="color:var(--accent);">Read More →</span>
+              <span style="color:var(--text-secondary);opacity:0.5;">2025</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-8">
+          <a href="https://medium.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-xs font-mono preview-link" style="color:var(--text-secondary);">
+            <i data-lucide="external-link" class="w-3 h-3"></i>
+            View all writeups on Medium
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- GLOW DIVIDER -->
+    <div class="glow-line max-w-6xl mx-auto"></div>
+
+    <!-- SKILLS -->
+    <section id="skills" class="py-20 lg:py-28">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+            <i data-lucide="code-2" class="w-3 h-3"></i>
+            <span>Stack & Expertise</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Technical Arsenal</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Core competencies across blockchain security, engineering, and infrastructure.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="glass-card rounded-xl p-6">
+            <div class="w-10 h-10 rounded-lg accent-bg accent-border flex items-center justify-center mb-4">
+              <i data-lucide="shield" class="w-5 h-5 accent-text"></i>
+            </div>
+            <h3 class="text-base font-semibold mb-3" style="color:var(--text-primary);">Blockchain Security</h3>
+            <p class="text-xs mb-4" style="color:var(--text-secondary);">Smart contract auditing, DeFi exploit research, and cross-chain security analysis.</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Solidity</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Foundry</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Slither</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Echidna</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">EVM</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-6">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style="background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.2);">
+              <i data-lucide="terminal" class="w-5 h-5" style="color:#14b8a6;"></i>
+            </div>
+            <h3 class="text-base font-semibold mb-3" style="color:var(--text-primary);">Software Engineering</h3>
+            <p class="text-xs mb-4" style="color:var(--text-secondary);">Full-stack development with modern frameworks, tooling, and infrastructure automation.</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">TypeScript</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">React</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Python</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Rust</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Go</span>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-6">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style="background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);">
+              <i data-lucide="cloud" class="w-5 h-5" style="color:#818cf8;"></i>
+            </div>
+            <h3 class="text-base font-semibold mb-3" style="color:var(--text-primary);">Infrastructure</h3>
+            <p class="text-xs mb-4" style="color:var(--text-secondary);">Cloud architecture, automation, and scalable production deployments.</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Docker</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">AWS</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">K8s</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Terraform</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">CI/CD</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GITHUB REPOS (LIVE FROM API) -->
+        <div class="mt-16">
+          <div class="flex items-center justify-between mb-8">
+            <h3 class="text-lg font-semibold" style="color:var(--text-primary);">Latest Repositories</h3>
+            <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="text-xs font-mono flex items-center gap-1 preview-link" style="color:var(--text-secondary);">
+              <i data-lucide="github" class="w-3 h-3"></i>
+              GitHub Profile
+            </a>
+          </div>
+          <div id="github-repos" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="glass-card rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-4 h-4 rounded-full repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-4 rounded w-32 repo-skeleton" style="background:var(--bg-glass);"></div>
+              </div>
+              <div class="h-3 rounded w-full repo-skeleton mb-2" style="background:var(--bg-glass);"></div>
+              <div class="h-3 rounded w-3/4 repo-skeleton" style="background:var(--bg-glass);"></div>
+              <div class="flex gap-3 mt-3">
+                <div class="h-3 rounded w-16 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-3 rounded w-12 repo-skeleton" style="background:var(--bg-glass);"></div>
+              </div>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-4 h-4 rounded-full repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-4 rounded w-28 repo-skeleton" style="background:var(--bg-glass);"></div>
+              </div>
+              <div class="h-3 rounded w-full repo-skeleton mb-2" style="background:var(--bg-glass);"></div>
+              <div class="h-3 rounded w-2/3 repo-skeleton" style="background:var(--bg-glass);"></div>
+              <div class="flex gap-3 mt-3">
+                <div class="h-3 rounded w-14 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-3 rounded w-10 repo-skeleton" style="background:var(--bg-glass);"></div>
+              </div>
+            </div>
+            <div class="glass-card rounded-xl p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-4 h-4 rounded-full repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-4 rounded w-36 repo-skeleton" style="background:var(--bg-glass);"></div>
+              </div>
+              <div class="h-3 rounded w-full repo-skeleton mb-2" style="background:var(--bg-glass);"></div>
+              <div class="h-3 rounded w-4/5 repo-skeleton" style="background:var(--bg-glass);"></div>
+              <div class="flex gap-3 mt-3">
+                <div class="h-3 rounded w-12 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-3 rounded w-14 repo-skeleton" style="background:var(--bg-glass);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="py-20 lg:py-28">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+            <i data-lucide="message-circle" class="w-3 h-3"></i>
+            <span>Contact</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Get in Touch</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Security research inquiries, collaboration, or just to connect.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <!-- Contact Cards -->
+          <div class="space-y-4">
+            <a href="mailto:adulshadega@gmail.com" class="glass-card rounded-xl p-5 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg accent-bg accent-border flex items-center justify-center shrink-0">
+                <i data-lucide="mail" class="w-5 h-5 accent-text"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium group-hover:accent-text transition-colors" style="color:var(--text-primary);">adulshadega@gmail.com</div>
+                <div class="text-[10px]" style="color:var(--text-secondary);">Email · 24h response</div>
+              </div>
+            </a>
+            <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="glass-card rounded-xl p-5 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.2);">
+                <i data-lucide="github" class="w-5 h-5" style="color:#14b8a6;"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium group-hover:accent-text transition-colors" style="color:var(--text-primary);">a16zcrypt0</div>
+                <div class="text-[10px]" style="color:var(--text-secondary);">GitHub · Open source</div>
+              </div>
+            </a>
+            <a href="https://t.me/adulsadega" target="_blank" rel="noopener" class="glass-card rounded-xl p-5 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);">
+                <i data-lucide="send" class="w-5 h-5" style="color:#818cf8;"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium group-hover:accent-text transition-colors" style="color:var(--text-primary);">@adulsadega</div>
+                <div class="text-[10px]" style="color:var(--text-secondary);">Telegram · Fast response</div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Contact Form -->
+          <div class="glass-card rounded-xl p-6 gradient-border">
+            <h3 class="text-sm font-semibold mb-4" style="color:var(--text-primary);">Send a Message</h3>
+            <form id="contact-form" action="https://formsubmit.co/adulshadega@gmail.com" method="POST" class="space-y-4" onsubmit="handleForm(event)">
+              <input type="hidden" name="_subject" value="[Portfolio] New Message" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="text" name="_honey" style="display:none" />
+              <div>
+                <input type="text" name="name" placeholder="Your Name" required class="form-input" />
+              </div>
+              <div>
+                <input type="email" name="email" placeholder="you@email.com" required class="form-input" />
+              </div>
+              <div>
+                <textarea name="message" rows="4" placeholder="Your message..." required class="form-input" style="resize:vertical;min-height:100px;"></textarea>
+              </div>
+              <button type="submit" class="w-full py-2.5 rounded-xl accent-btn font-medium text-sm flex items-center justify-center gap-2" id="form-submit-btn">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                Send Message
+              </button>
+              <div id="form-status" class="text-xs text-center font-mono" style="color:var(--accent);display:none;"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t py-8" style="border-color:var(--border-color);">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-xs" style="color:var(--text-secondary);opacity:0.6;">
+        &copy; 2026 <span class="font-mono" style="color:var(--text-secondary);">a16zcrypt0</span>
+      </div>
+      <div class="flex items-center gap-1 text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.4;">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500/60"></span>
+        <span>SYSTEM: SECURE · ONLINE</span>
+      </div>
+      <div class="flex items-center gap-4 text-xs" style="color:var(--text-secondary);opacity:0.6;">
+        <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="hover:accent-text transition-colors">GitHub</a>
+        <span style="opacity:0.3;">|</span>
+        <a href="https://t.me/adulsadega" target="_blank" rel="noopener" class="hover:accent-text transition-colors">Telegram</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  // === LUCIDE INIT ===
+  lucide.createIcons();
+
+  // === THEME TOGGLE ===
+  function toggleTheme() {
+    const html = document.documentElement;
+    const cur = html.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    document.getElementById('theme-icon').setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
+    lucide.createIcons();
+    localStorage.setItem('portfolio-theme', next);
+  }
+  function setAccent(name) {
+    document.documentElement.setAttribute('data-accent', name);
+    document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
+    document.querySelector(`.accent-dot[style*="${name === 'sky' ? '#38bdf8' : name === 'teal' ? '#14b8a6' : name === 'violet' ? '#818cf8' : '#34d399'}"]`).classList.add('active');
+    localStorage.setItem('portfolio-accent', name);
+    toggleAccentPicker();
+  }
+  function toggleAccentPicker() {
+    document.getElementById('accent-picker').classList.toggle('hidden');
+  }
+  // Restore saved preferences
+  (function restorePrefs() {
+    const theme = localStorage.getItem('portfolio-theme');
+    const accent = localStorage.getItem('portfolio-accent');
+    if (theme) document.documentElement.setAttribute('data-theme', theme);
+    if (accent) document.documentElement.setAttribute('data-accent', accent);
+  })();
+
+  // === WEATHER ===
+  (function getWeather() {
+    const weatherIcons = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌦️',82:'🌧️',85:'🌨️',86:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
+    const dlat = -6.2088, dlon = 106.8456, dcity = 'Jakarta';
+    function fw(lat, lon, city) {
+      document.getElementById('weather-location').textContent = city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weathercode,wind_speed_10m&timezone=auto`)
+        .then(r => r.json()).then(d => {
+          const c = d.current;
+          document.getElementById('weather-temp').textContent = `${Math.round(c.temperature_2m)}°C`;
+          document.getElementById('weather-humidity').textContent = `${c.relative_humidity_2m}%`;
+          document.getElementById('weather-wind').textContent = `${Math.round(c.wind_speed_10m)} km/h`;
+          document.getElementById('weather-icon').textContent = weatherIcons[c.weathercode] || '🌤️';
+          document.getElementById('weather-desc').textContent = 'Live · Updated now';
+        }).catch(() => { /* keep defaults */ });
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p => fw(p.coords.latitude, p.coords.longitude), () => fw(dlat, dlon, dcity), {timeout:5000});
+    } else { fw(dlat, dlon, dcity); }
+  })();
+
+  // === NETWORK ===
+  (function getNetwork() {
+    const ua = navigator.userAgent;
+    let browser = 'Other', os = 'Unknown';
+    if (ua.includes('Firefox')) browser='Firefox'; else if (ua.includes('Edge')) browser='Edge';
+    else if (ua.includes('Chrome')) browser='Chrome'; else if (ua.includes('Safari')) browser='Safari';
+    if (ua.includes('Windows')) os='Windows'; else if (ua.includes('Mac')) os='macOS';
+    else if (ua.includes('Linux')) os='Linux'; else if (ua.includes('Android')) os='Android';
+    else if (ua.includes('iPhone')||ua.includes('iPad')) os='iOS';
+    document.getElementById('network-browser').textContent = `${browser} · ${os}`;
+    fetch('https://ip-api.com/json/').then(r=>r.json()).then(d => {
+      document.getElementById('network-ip').textContent = d.query || '--';
+      document.getElementById('network-isp').textContent = d.isp || d.org || '--';
+      document.getElementById('network-country').textContent = [d.city, d.country].filter(Boolean).join(', ') || '--';
+    }).catch(() => {});
+  })();
+
+  // === VISIT COUNTER (countapi.xyz) ===
+  (function getCounter() {
+    const key = 'portfolio-' + Date.now().toString(36);
+    // Try to get total hits
+    fetch('https://api.countapi.xyz/get/a16zcrypt0/portfolio')
+      .then(r => r.json()).then(d => {
+        if (d.value !== undefined) {
+          document.getElementById('counter-value').textContent = d.value.toLocaleString();
+        }
+      }).catch(() => {
+        document.getElementById('counter-value').textContent = '--';
+      });
+    // Hit (increment)
+    fetch('https://api.countapi.xyz/hit/a16zcrypt0/portfolio')
+      .then(r => r.json()).then(d => {
+        if (d.value !== undefined) {
+          document.getElementById('counter-value').textContent = d.value.toLocaleString();
+        }
+      }).catch(() => {});
+  })();
+
+  // === GITHUB REPOS (Live API) ===
+  (function getGitHubRepos() {
+    const container = document.getElementById('github-repos');
+    fetch('https://api.github.com/users/a16zcrypt0/repos?sort=updated&per_page=6&type=public')
+      .then(r => r.json()).then(repos => {
+        if (!Array.isArray(repos) || repos.length === 0) {
+          container.innerHTML = '<div class="col-span-full text-center text-sm py-8" style="color:var(--text-secondary);">No public repositories yet.</div>';
+          return;
+        }
+        const langColors = {Solidity:'#363636',TypeScript:'#3178c6',JavaScript:'#f1e05a',Python:'#3572A5',Rust:'#dea584',Go:'#00ADD8',Shell:'#89e051',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Dockerfile:'#384d54',Move:'#4a76a8',Cairo:'#ff4f00'};
+        const DEFAULT_LANG_COLOR = '#6b7280';
+        container.innerHTML = repos.map(repo => {
+          const lang = repo.language || 'Unknown';
+          const langColor = langColors[lang] || DEFAULT_LANG_COLOR;
+          const desc = repo.description || 'No description available.';
+          const stars = repo.stargazers_count || 0;
+          const forks = repo.forks_count || 0;
+          const updated = new Date(repo.updated_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+          return `<a href="${repo.html_url}" target="_blank" rel="noopener" class="glass-card rounded-xl p-5 group">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="book" class="w-4 h-4 shrink-0" style="color:var(--accent);"></i>
+              <span class="text-sm font-medium group-hover:accent-text transition-colors truncate" style="color:var(--text-primary);">${repo.name}</span>
+            </div>
+            <p class="text-xs leading-relaxed line-clamp-2" style="color:var(--text-secondary);">${desc}</p>
+            <div class="flex items-center gap-4 mt-3 text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.7;">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full" style="background:${langColor};display:inline-block;"></span>${lang}</span>
+              <span class="flex items-center gap-1"><i data-lucide="star" class="w-3 h-3"></i>${stars}</span>
+              <span class="flex items-center gap-1"><i data-lucide="git-fork" class="w-3 h-3"></i>${forks}</span>
+              <span class="ml-auto">${updated}</span>
+            </div>
+          </a>`;
+        }).join('');
+        lucide.createIcons();
+      }).catch(() => {
+        container.innerHTML = '<div class="col-span-full text-center text-sm py-8" style="color:var(--text-secondary);">Failed to load repositories.</div>';
+      });
+  })();
+
+  // === CONTACT FORM ===
+  function handleForm(e) {
+    e.preventDefault();
+    const btn = document.getElementById('form-submit-btn');
+    const status = document.getElementById('form-status');
+    const form = document.getElementById('contact-form');
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Sending...';
+    status.style.display = 'none';
+    lucide.createIcons();
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: {'Accept': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        status.textContent = '✓ Message sent successfully!';
+        status.style.color = '#34d399';
+        form.reset();
+      } else {
+        status.textContent = '✗ Failed to send. Email me directly instead.';
+        status.style.color = '#f87171';
+      }
+      status.style.display = 'block';
+    })
+    .catch(() => {
+      status.textContent = '✗ Network error. Please email me directly.';
+      status.style.color = '#f87171';
+      status.style.display = 'block';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Send Message';
+      lucide.createIcons();
+      setTimeout(() => { status.style.display = 'none'; }, 5000);
+    });
+  }
+
+  // Click outside to close accent picker
+  document.addEventListener('click', function(e) {
+    const picker = document.getElementById('accent-picker');
+    const btn = document.getElementById('accent-btn');
+    if (!picker.classList.contains('hidden') && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+      picker.classList.add('hidden');
+    }
+  });
+  </script>
+</body>
+</html>

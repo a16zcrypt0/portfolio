@@ -1,0 +1,9 @@
+{
+  "name": "adulshadega-portfolio",
+  "version": "1.0.0",
+  "description": "Personal portfolio — Tech · AI · Cybersecurity",
+  "scripts": {
+    "build": "echo 'static site, no build needed'",
+    "dev": "npx serve ."
+  }
+}
