@@ -572,9 +572,9 @@
           <div class="glass-card rounded-xl p-6 gradient-border">
             <h3 class="text-sm font-semibold mb-4" style="color:var(--text-primary);">Send a Message</h3>
             <form id="contact-form" action="https://formsubmit.co/adulshadega@gmail.com" method="POST" class="space-y-4" onsubmit="handleForm(event)">
-              <input type="hidden" name="_subject" value="[Portfolio] New Message" />
-              <input type="hidden" name="_captcha" value="false" />
-              <input type="text" name="_honey" style="display:none" />
+              <input type="hidden" name="_subject" value="[Portfolio] New Message">
+              <input type="hidden" name="_template" value="table">
+              <input type="text" name="_honey" style="display:none">
               <div>
                 <input type="text" name="name" placeholder="Your Name" required class="form-input" />
               </div>
@@ -667,7 +667,7 @@
     } else { fw(dlat, dlon, dcity); }
   })();
 
-  // === NETWORK ===
+  // === NETWORK (privacy-safe — no third-party IP lookup) ===
   (function getNetwork() {
     const ua = navigator.userAgent;
     let browser = 'Other', os = 'Unknown';
@@ -677,11 +677,10 @@
     else if (ua.includes('Linux')) os='Linux'; else if (ua.includes('Android')) os='Android';
     else if (ua.includes('iPhone')||ua.includes('iPad')) os='iOS';
     document.getElementById('network-browser').textContent = `${browser} · ${os}`;
-    fetch('https://ip-api.com/json/').then(r=>r.json()).then(d => {
-      document.getElementById('network-ip').textContent = d.query || '--';
-      document.getElementById('network-isp').textContent = d.isp || d.org || '--';
-      document.getElementById('network-country').textContent = [d.city, d.country].filter(Boolean).join(', ') || '--';
-    }).catch(() => {});
+    // Display browser/OS only — no IP/ISP lookup (privacy)
+    document.getElementById('network-ip').textContent = '🔒 Private';
+    document.getElementById('network-isp').textContent = 'Hidden';
+    document.getElementById('network-country').textContent = 'Protected';
   })();
 
   // === VISIT COUNTER (countapi.xyz) ===
@@ -705,41 +704,108 @@
       }).catch(() => {});
   })();
 
-  // === GITHUB REPOS (Live API) ===
+  // === GITHUB REPOS (Live API) — XSS-safe via DOM API ===
   (function getGitHubRepos() {
     const container = document.getElementById('github-repos');
     fetch('https://api.github.com/users/a16zcrypt0/repos?sort=updated&per_page=6&type=public')
       .then(r => r.json()).then(repos => {
         if (!Array.isArray(repos) || repos.length === 0) {
-          container.innerHTML = '<div class="col-span-full text-center text-sm py-8" style="color:var(--text-secondary);">No public repositories yet.</div>';
+          container.textContent = '';
+          const empty = document.createElement('div');
+          empty.className = 'col-span-full text-center text-sm py-8';
+          empty.style.color = 'var(--text-secondary)';
+          empty.textContent = 'No public repositories yet.';
+          container.appendChild(empty);
           return;
         }
         const langColors = {Solidity:'#363636',TypeScript:'#3178c6',JavaScript:'#f1e05a',Python:'#3572A5',Rust:'#dea584',Go:'#00ADD8',Shell:'#89e051',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Dockerfile:'#384d54',Move:'#4a76a8',Cairo:'#ff4f00'};
         const DEFAULT_LANG_COLOR = '#6b7280';
-        container.innerHTML = repos.map(repo => {
+        container.textContent = '';
+        repos.forEach(repo => {
           const lang = repo.language || 'Unknown';
           const langColor = langColors[lang] || DEFAULT_LANG_COLOR;
           const desc = repo.description || 'No description available.';
           const stars = repo.stargazers_count || 0;
           const forks = repo.forks_count || 0;
           const updated = new Date(repo.updated_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-          return `<a href="${repo.html_url}" target="_blank" rel="noopener" class="glass-card rounded-xl p-5 group">
-            <div class="flex items-center gap-2 mb-3">
-              <i data-lucide="book" class="w-4 h-4 shrink-0" style="color:var(--accent);"></i>
-              <span class="text-sm font-medium group-hover:accent-text transition-colors truncate" style="color:var(--text-primary);">${repo.name}</span>
-            </div>
-            <p class="text-xs leading-relaxed line-clamp-2" style="color:var(--text-secondary);">${desc}</p>
-            <div class="flex items-center gap-4 mt-3 text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.7;">
-              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full" style="background:${langColor};display:inline-block;"></span>${lang}</span>
-              <span class="flex items-center gap-1"><i data-lucide="star" class="w-3 h-3"></i>${stars}</span>
-              <span class="flex items-center gap-1"><i data-lucide="git-fork" class="w-3 h-3"></i>${forks}</span>
-              <span class="ml-auto">${updated}</span>
-            </div>
-          </a>`;
-        }).join('');
+
+          // Build with DOM API — no innerHTML, all text via textContent
+          const card = document.createElement('a');
+          card.href = repo.html_url;
+          card.target = '_blank';
+          card.rel = 'noopener';
+          card.className = 'glass-card rounded-xl p-5 group';
+
+          const header = document.createElement('div');
+          header.className = 'flex items-center gap-2 mb-3';
+          const icon = document.createElement('i');
+          icon.setAttribute('data-lucide', 'book');
+          icon.className = 'w-4 h-4 shrink-0';
+          icon.style.color = 'var(--accent)';
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'text-sm font-medium group-hover:accent-text transition-colors truncate';
+          nameSpan.style.color = 'var(--text-primary)';
+          nameSpan.textContent = repo.name; // safe
+          header.appendChild(icon);
+          header.appendChild(nameSpan);
+
+          const descP = document.createElement('p');
+          descP.className = 'text-xs leading-relaxed line-clamp-2';
+          descP.style.color = 'var(--text-secondary)';
+          descP.textContent = desc; // safe
+
+          const meta = document.createElement('div');
+          meta.className = 'flex items-center gap-4 mt-3 text-[10px] font-mono';
+          meta.style.color = 'var(--text-secondary)';
+          meta.style.opacity = '0.7';
+
+          const langSpan = document.createElement('span');
+          langSpan.className = 'flex items-center gap-1';
+          const dot = document.createElement('span');
+          dot.className = 'w-2 h-2 rounded-full';
+          dot.style.background = langColor;
+          dot.style.display = 'inline-block';
+          langSpan.appendChild(dot);
+          langSpan.appendChild(document.createTextNode(lang));
+
+          const starSpan = document.createElement('span');
+          starSpan.className = 'flex items-center gap-1';
+          const starIcon = document.createElement('i');
+          starIcon.setAttribute('data-lucide', 'star');
+          starIcon.className = 'w-3 h-3';
+          starSpan.appendChild(starIcon);
+          starSpan.appendChild(document.createTextNode(stars));
+
+          const forkSpan = document.createElement('span');
+          forkSpan.className = 'flex items-center gap-1';
+          const forkIcon = document.createElement('i');
+          forkIcon.setAttribute('data-lucide', 'git-fork');
+          forkIcon.className = 'w-3 h-3';
+          forkSpan.appendChild(forkIcon);
+          forkSpan.appendChild(document.createTextNode(forks));
+
+          const dateSpan = document.createElement('span');
+          dateSpan.style.marginLeft = 'auto';
+          dateSpan.textContent = updated;
+
+          meta.appendChild(langSpan);
+          meta.appendChild(starSpan);
+          meta.appendChild(forkSpan);
+          meta.appendChild(dateSpan);
+
+          card.appendChild(header);
+          card.appendChild(descP);
+          card.appendChild(meta);
+          container.appendChild(card);
+        });
         lucide.createIcons();
       }).catch(() => {
-        container.innerHTML = '<div class="col-span-full text-center text-sm py-8" style="color:var(--text-secondary);">Failed to load repositories.</div>';
+        container.textContent = '';
+        const fail = document.createElement('div');
+        fail.className = 'col-span-full text-center text-sm py-8';
+        fail.style.color = 'var(--text-secondary)';
+        fail.textContent = 'Failed to load repositories.';
+        container.appendChild(fail);
       });
   })();
 
