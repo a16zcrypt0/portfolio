@@ -23,3 +23,12 @@ Personal portfolio website — **Tech · AI · Cybersecurity**
 ```bash
 npx serve .
 ```
+
+## Tests
+Front-end logic lives in `js/` as ES modules and is unit tested with Vitest + jsdom.
+
+```bash
+npm install
+npm test          # run the suite
+npm run coverage  # run with a coverage report
+```
