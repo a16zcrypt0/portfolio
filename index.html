@@ -116,7 +116,25 @@
       -webkit-mask-composite: xor; mask-composite: exclude;
       pointer-events: none;
     }
-    .skill-tag { transition: all 0.2s ease; }
+    /* text color utilities */
+    .text-pri { color: var(--text-primary); }
+    .text-sec { color: var(--text-secondary); }
+    .text-faint { color: var(--text-secondary); opacity: 0.5; }
+    /* tinted boxes — child icons inherit currentColor */
+    .tint-accent { background: var(--accent-light); border: 1px solid var(--border-accent); color: var(--accent); }
+    .tint-teal { background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.2); color: #14b8a6; }
+    .tint-violet { background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.2); color: #818cf8; }
+    .icon-box { display: flex; align-items: center; justify-content: center; }
+    /* pill above each section heading */
+    .section-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.375rem 0.75rem; border-radius: 9999px;
+      font-size: 0.75rem; line-height: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+    }
+    .chip { background: var(--bg-glass); }
+    .skill-tag { transition: all 0.2s ease; background: var(--bg-glass); color: var(--text-secondary); }
     .skill-tag:hover { background: var(--accent-light); color: var(--accent); transform: translateY(-1px); }
     .glow-line { height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
     ::selection { background: var(--accent-light); color: var(--text-primary); }
@@ -144,7 +162,7 @@
       font-size: 0.875rem; transition: border-color 0.2s; width: 100%;
     }
     .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
-    .repo-skeleton { animation: pulse-glow 2s infinite; }
+    .repo-skeleton { animation: pulse-glow 2s infinite; background: var(--bg-glass); }
     @keyframes pulse-glow { 0%,100% { opacity: 0.4; } 50% { opacity: 0.7; } }
     /* preview-link */
     .preview-link { position: relative; display: inline-block; }
@@ -160,24 +178,24 @@
   <header class="fixed top-0 left-0 right-0 z-50 glass border-b" style="border-color: var(--border-color);">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <a href="#" class="flex items-center gap-2 group">
-        <div class="w-8 h-8 rounded-lg accent-bg accent-border flex items-center justify-center text-xs font-bold accent-text font-mono">AZ</div>
-        <span class="text-sm font-medium" style="color:var(--text-primary);">a16zcrypt0</span>
+        <div class="w-8 h-8 rounded-lg icon-box tint-accent text-xs font-bold font-mono">AZ</div>
+        <span class="text-sm font-medium text-pri">a16zcrypt0</span>
       </a>
-      <nav class="hidden sm:flex items-center gap-8 text-sm" style="color:var(--text-secondary);">
-        <a href="#hero" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Home</a>
-        <a href="#dashboard" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Dashboard</a>
-        <a href="#writeups" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Writeups</a>
-        <a href="#skills" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Skills</a>
-        <a href="#contact" class="hover:accent-text transition-colors" style="color:var(--text-secondary);">Contact</a>
+      <nav class="hidden sm:flex items-center gap-8 text-sm text-sec">
+        <a href="#hero" class="hover:accent-text transition-colors text-sec">Home</a>
+        <a href="#dashboard" class="hover:accent-text transition-colors text-sec">Dashboard</a>
+        <a href="#writeups" class="hover:accent-text transition-colors text-sec">Writeups</a>
+        <a href="#skills" class="hover:accent-text transition-colors text-sec">Skills</a>
+        <a href="#contact" class="hover:accent-text transition-colors text-sec">Contact</a>
       </nav>
       <div class="flex items-center gap-2">
         <!-- Theme Toggle -->
-        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors" style="color:var(--text-secondary);" onclick="toggleTheme()">
+        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors text-sec" onclick="toggleTheme()">
           <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
         </button>
         <!-- Accent Picker -->
         <div class="relative">
-          <button id="accent-btn" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors" style="color:var(--text-secondary);" onclick="toggleAccentPicker()">
+          <button id="accent-btn" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors text-sec" onclick="toggleAccentPicker()">
             <i data-lucide="palette" class="w-4 h-4"></i>
           </button>
           <div id="accent-picker" class="absolute right-0 top-full mt-2 glass rounded-xl p-3 hidden" style="min-width:160px;">
@@ -189,7 +207,7 @@
             </div>
           </div>
         </div>
-        <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors" style="color:var(--text-secondary);">
+        <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="p-2 rounded-lg hover:bg-white/[0.05] transition-colors text-sec">
           <i data-lucide="github" class="w-4 h-4"></i>
         </a>
       </div>
@@ -207,17 +225,17 @@
         <div class="grid lg:grid-cols-2 gap-12 items-center">
           <div class="space-y-8" style="animation: slideUp 0.8s ease-out;">
             <style>@keyframes slideUp {0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}</style>
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text">
+            <div class="section-badge glass-light">
               <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
               <span>Active / Security Research</span>
             </div>
             <div>
               <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
-                <span style="color:var(--text-primary);">Building at the intersection of</span>
+                <span class="text-pri">Building at the intersection of</span>
                 <br />
                 <span class="gradient-text">Tech · AI · Cybersecurity</span>
               </h1>
-              <p class="mt-6 text-base sm:text-lg leading-relaxed max-w-xl" style="color:var(--text-secondary);">
+              <p class="mt-6 text-base sm:text-lg leading-relaxed max-w-xl text-sec">
                 Independent security researcher focused on Web3, DeFi, and offensive security.
                 Smart contract auditing, exploit development, and infrastructure that scales.
               </p>
@@ -227,14 +245,14 @@
                 Explore Dashboard
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <a href="#contact" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm" style="border:1px solid var(--border-color);color:var(--text-secondary);" onmouseover="this.style.borderColor='var(--border-accent)'" onmouseout="this.style.borderColor='var(--border-color)'">
+              <a href="#contact" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm text-sec" style="border:1px solid var(--border-color);" onmouseover="this.style.borderColor='var(--border-accent)'" onmouseout="this.style.borderColor='var(--border-color)'">
                 Get in Touch
               </a>
             </div>
             <div class="flex flex-wrap gap-8 pt-4">
-              <div><div class="text-lg font-semibold font-mono" style="color:var(--text-primary);">5+</div><div class="text-xs mt-0.5" style="color:var(--text-secondary);">Years Research</div></div>
-              <div><div class="text-lg font-semibold font-mono accent-text">15+</div><div class="text-xs mt-0.5" style="color:var(--text-secondary);">Protocols Audited</div></div>
-              <div><div class="text-lg font-semibold font-mono" style="color:#14b8a6;">50+</div><div class="text-xs mt-0.5" style="color:var(--text-secondary);">CVEs & Findings</div></div>
+              <div><div class="text-lg font-semibold font-mono text-pri">5+</div><div class="text-xs mt-0.5 text-sec">Years Research</div></div>
+              <div><div class="text-lg font-semibold font-mono accent-text">15+</div><div class="text-xs mt-0.5 text-sec">Protocols Audited</div></div>
+              <div><div class="text-lg font-semibold font-mono" style="color:#14b8a6;">50+</div><div class="text-xs mt-0.5 text-sec">CVEs & Findings</div></div>
             </div>
           </div>
           <div class="hidden lg:block">
@@ -243,21 +261,21 @@
                 <span class="w-2.5 h-2.5 rounded-full bg-red-400/60"></span>
                 <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/60"></span>
                 <span class="w-2.5 h-2.5 rounded-full bg-green-400/60"></span>
-                <span class="ml-2 text-xs font-mono" style="color:var(--text-secondary);">~/terminal — zsh</span>
+                <span class="ml-2 text-xs font-mono text-sec">~/terminal — zsh</span>
               </div>
               <div class="p-5 font-mono text-xs leading-relaxed">
                 <div style="color:rgba(52,211,153,0.7);"># security research terminal</div>
-                <div class="mt-2"><span class="accent-text">superagent@a16z</span><span style="color:var(--text-secondary);">:</span><span style="color:#14b8a6;">~</span><span style="color:var(--text-secondary);">$</span> ./scan --target=portfolio</div>
+                <div class="mt-2"><span class="accent-text">superagent@a16z</span><span class="text-sec">:</span><span style="color:#14b8a6;">~</span><span class="text-sec">$</span> ./scan --target=portfolio</div>
                 <div style="color:rgba(52,211,153,0.7);margin-top:4px;">[✓] Target acquired: fully secured</div>
                 <div style="color:rgba(52,211,153,0.7);">[✓] Vulnerability scan: 0 critical, 0 high</div>
                 <div style="color:rgba(52,211,153,0.7);">[✓] Deploying frontend...</div>
                 <div class="accent-text mt-1">→ Deployment live at vercel.app</div>
                 <div class="mt-3 flex flex-wrap gap-1.5">
-                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:var(--text-secondary);">Solidity</span>
-                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:var(--accent);">Rust</span>
-                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:#14b8a6;">TypeScript</span>
-                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:#34d399;">Python</span>
-                  <span class="px-2 py-0.5 rounded" style="background:var(--bg-glass);color:var(--text-secondary);">Go</span>
+                  <span class="chip px-2 py-0.5 rounded text-sec">Solidity</span>
+                  <span class="chip px-2 py-0.5 rounded accent-text">Rust</span>
+                  <span class="chip px-2 py-0.5 rounded" style="color:#14b8a6;">TypeScript</span>
+                  <span class="chip px-2 py-0.5 rounded" style="color:#34d399;">Python</span>
+                  <span class="chip px-2 py-0.5 rounded text-sec">Go</span>
                 </div>
               </div>
             </div>
@@ -270,12 +288,12 @@
     <section id="dashboard" class="py-20 lg:py-28">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+          <div class="section-badge glass-light mb-4">
             <i data-lucide="activity" class="w-3 h-3"></i>
             <span>Live Dashboard</span>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Real-time Intelligence</h2>
-          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Live metrics from your browsing session — network, environment, and conditions.</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-pri">Real-time Intelligence</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto text-sec">Live metrics from your browsing session — network, environment, and conditions.</p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-4 lg:gap-6">
@@ -284,22 +302,22 @@
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-2">
                 <i data-lucide="cloud-sun" class="w-4 h-4 accent-text widget-icon"></i>
-                <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Weather</span>
+                <span class="text-xs font-mono uppercase tracking-wider text-sec">Weather</span>
               </div>
-              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">OPEN-METEO</span>
+              <span class="text-[10px] font-mono text-faint">OPEN-METEO</span>
             </div>
             <div id="weather-content">
               <div class="flex items-center gap-4">
                 <div id="weather-icon" class="text-3xl">🌤️</div>
                 <div>
-                  <div id="weather-temp" class="text-2xl font-bold font-mono" style="color:var(--text-primary);">--°C</div>
-                  <div id="weather-desc" class="text-xs mt-0.5" style="color:var(--text-secondary);">Loading...</div>
+                  <div id="weather-temp" class="text-2xl font-bold font-mono text-pri">--°C</div>
+                  <div id="weather-desc" class="text-xs mt-0.5 text-sec">Loading...</div>
                 </div>
               </div>
               <div class="grid grid-cols-3 gap-1.5 mt-3">
-                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-humidity" class="text-xs font-mono" style="color:var(--text-primary);">--%</div><div class="text-[10px] mt-0.5" style="color:var(--text-secondary);">Humidity</div></div>
-                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-wind" class="text-xs font-mono" style="color:var(--text-primary);">-- km/h</div><div class="text-[10px] mt-0.5" style="color:var(--text-secondary);">Wind</div></div>
-                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-location" class="text-xs font-mono" style="color:var(--text-primary);">--</div><div class="text-[10px] mt-0.5" style="color:var(--text-secondary);">Location</div></div>
+                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-humidity" class="text-xs font-mono text-pri">--%</div><div class="text-[10px] mt-0.5 text-sec">Humidity</div></div>
+                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-wind" class="text-xs font-mono text-pri">-- km/h</div><div class="text-[10px] mt-0.5 text-sec">Wind</div></div>
+                <div class="glass-light rounded-lg p-2 text-center"><div id="weather-location" class="text-xs font-mono text-pri">--</div><div class="text-[10px] mt-0.5 text-sec">Location</div></div>
               </div>
             </div>
           </div>
@@ -309,27 +327,27 @@
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-2">
                 <i data-lucide="activity" class="w-4 h-4" style="color:#14b8a6;"></i>
-                <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Visitor</span>
+                <span class="text-xs font-mono uppercase tracking-wider text-sec">Visitor</span>
               </div>
-              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">ip-api.com</span>
+              <span class="text-[10px] font-mono text-faint">ip-api.com</span>
             </div>
             <div id="network-content" class="space-y-2.5">
               <div class="flex items-center gap-3 pb-2.5 border-b" style="border-color:var(--border-color);">
-                <div class="w-8 h-8 rounded-lg" style="background:rgba(20,184,166,0.1);display:flex;align-items:center;justify-content:center;">
-                  <i data-lucide="globe" class="w-4 h-4" style="color:#14b8a6;"></i>
+                <div class="w-8 h-8 rounded-lg icon-box tint-teal">
+                  <i data-lucide="globe" class="w-4 h-4"></i>
                 </div>
                 <div>
-                  <div id="network-ip" class="text-sm font-mono" style="color:var(--text-primary);">Loading...</div>
-                  <div class="text-[10px]" style="color:var(--text-secondary);">IPv4 Address</div>
+                  <div id="network-ip" class="text-sm font-mono text-pri">Loading...</div>
+                  <div class="text-[10px] text-sec">IPv4 Address</div>
                 </div>
               </div>
               <div class="grid grid-cols-2 gap-1.5">
-                <div class="glass-light rounded-lg p-2"><div id="network-isp" class="text-xs font-mono truncate" style="color:var(--text-primary);">--</div><div class="text-[10px]" style="color:var(--text-secondary);">ISP</div></div>
-                <div class="glass-light rounded-lg p-2"><div id="network-country" class="text-xs font-mono truncate" style="color:var(--text-primary);">--</div><div class="text-[10px]" style="color:var(--text-secondary);">Location</div></div>
+                <div class="glass-light rounded-lg p-2"><div id="network-isp" class="text-xs font-mono truncate text-pri">--</div><div class="text-[10px] text-sec">ISP</div></div>
+                <div class="glass-light rounded-lg p-2"><div id="network-country" class="text-xs font-mono truncate text-pri">--</div><div class="text-[10px] text-sec">Location</div></div>
               </div>
               <div class="glass-light rounded-lg p-2 flex items-center gap-2">
-                <i data-lucide="monitor" class="w-3 h-3 shrink-0" style="color:var(--text-secondary);"></i>
-                <div class="flex-1 min-w-0"><div id="network-browser" class="text-xs font-mono truncate" style="color:var(--text-secondary);">--</div><div class="text-[10px]" style="color:var(--text-secondary);opacity:0.6;">Browser / OS</div></div>
+                <i data-lucide="monitor" class="w-3 h-3 shrink-0 text-sec"></i>
+                <div class="flex-1 min-w-0"><div id="network-browser" class="text-xs font-mono truncate text-sec">--</div><div class="text-[10px] text-sec" style="opacity:0.6;">Browser / OS</div></div>
               </div>
             </div>
           </div>
@@ -339,17 +357,17 @@
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-2">
                 <i data-lucide="bar-chart-3" class="w-4 h-4" style="color:#818cf8;"></i>
-                <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Traffic</span>
+                <span class="text-xs font-mono uppercase tracking-wider text-sec">Traffic</span>
               </div>
-              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">countapi</span>
+              <span class="text-[10px] font-mono text-faint">countapi</span>
             </div>
             <div id="counter-content" class="flex flex-col items-center justify-center py-3">
-              <div class="w-10 h-10 rounded-lg" style="background:rgba(129,140,248,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
-                <i data-lucide="eye" class="w-5 h-5" style="color:#818cf8;"></i>
+              <div class="w-10 h-10 rounded-lg icon-box tint-violet mb-3">
+                <i data-lucide="eye" class="w-5 h-5"></i>
               </div>
-              <div id="counter-value" class="text-3xl font-bold font-mono" style="color:var(--text-primary);">---</div>
-              <div class="text-xs mt-1" style="color:var(--text-secondary);">Total Visits</div>
-              <div id="counter-today" class="text-xs font-mono mt-2" style="color:var(--text-secondary);opacity:0.6;">Today: --</div>
+              <div id="counter-value" class="text-3xl font-bold font-mono text-pri">---</div>
+              <div class="text-xs mt-1 text-sec">Total Visits</div>
+              <div id="counter-today" class="text-xs font-mono mt-2 text-sec" style="opacity:0.6;">Today: --</div>
             </div>
           </div>
         </div>
@@ -363,50 +381,50 @@
       </div>
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+          <div class="section-badge glass-light mb-4">
             <i data-lucide="file-text" class="w-3 h-3"></i>
             <span>Research</span>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Security Writeups</h2>
-          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Technical deep-dives into vulnerabilities, exploits, and blockchain security research.</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-pri">Security Writeups</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto text-sec">Technical deep-dives into vulnerabilities, exploits, and blockchain security research.</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
             <div class="flex items-center gap-2 mb-3">
               <span class="text-lg">🔴</span>
-              <span class="text-sm font-semibold" style="color:var(--text-primary);">Critical Reentrancy in DeFi</span>
+              <span class="text-sm font-semibold text-pri">Critical Reentrancy in DeFi</span>
             </div>
-            <p class="text-xs leading-relaxed" style="color:var(--text-secondary);">How a single-function reentrancy bypassed CEI pattern in a major lending protocol — full PoC breakdown.</p>
+            <p class="text-xs leading-relaxed text-sec">How a single-function reentrancy bypassed CEI pattern in a major lending protocol — full PoC breakdown.</p>
             <div class="flex items-center justify-between mt-4 text-[10px] font-mono">
-              <span style="color:var(--accent);">Read More →</span>
-              <span style="color:var(--text-secondary);opacity:0.5;">2026</span>
+              <span class="accent-text">Read More →</span>
+              <span class="text-faint">2026</span>
             </div>
           </div>
           <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
             <div class="flex items-center gap-2 mb-3">
               <span class="text-lg">🟠</span>
-              <span class="text-sm font-semibold" style="color:var(--text-primary);">Oracle Manipulation 101</span>
+              <span class="text-sm font-semibold text-pri">Oracle Manipulation 101</span>
             </div>
-            <p class="text-xs leading-relaxed" style="color:var(--text-secondary);">Flash loan powered oracle manipulation from theory to execution — TWAP vs spot price analysis.</p>
+            <p class="text-xs leading-relaxed text-sec">Flash loan powered oracle manipulation from theory to execution — TWAP vs spot price analysis.</p>
             <div class="flex items-center justify-between mt-4 text-[10px] font-mono">
-              <span style="color:var(--accent);">Read More →</span>
-              <span style="color:var(--text-secondary);opacity:0.5;">2026</span>
+              <span class="accent-text">Read More →</span>
+              <span class="text-faint">2026</span>
             </div>
           </div>
           <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
             <div class="flex items-center gap-2 mb-3">
               <span class="text-lg">🔵</span>
-              <span class="text-sm font-semibold" style="color:var(--text-primary);">Cross-chain Bridge Attacks</span>
+              <span class="text-sm font-semibold text-pri">Cross-chain Bridge Attacks</span>
             </div>
-            <p class="text-xs leading-relaxed" style="color:var(--text-secondary);">Analyzing message validation gaps in cross-chain bridges — from wormhole-style to custom relayers.</p>
+            <p class="text-xs leading-relaxed text-sec">Analyzing message validation gaps in cross-chain bridges — from wormhole-style to custom relayers.</p>
             <div class="flex items-center justify-between mt-4 text-[10px] font-mono">
-              <span style="color:var(--accent);">Read More →</span>
-              <span style="color:var(--text-secondary);opacity:0.5;">2025</span>
+              <span class="accent-text">Read More →</span>
+              <span class="text-faint">2025</span>
             </div>
           </div>
         </div>
         <div class="text-center mt-8">
-          <a href="https://medium.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-xs font-mono preview-link" style="color:var(--text-secondary);">
+          <a href="https://medium.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-xs font-mono preview-link text-sec">
             <i data-lucide="external-link" class="w-3 h-3"></i>
             View all writeups on Medium
           </a>
@@ -421,54 +439,54 @@
     <section id="skills" class="py-20 lg:py-28">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+          <div class="section-badge glass-light mb-4">
             <i data-lucide="code-2" class="w-3 h-3"></i>
             <span>Stack & Expertise</span>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Technical Arsenal</h2>
-          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Core competencies across blockchain security, engineering, and infrastructure.</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-pri">Technical Arsenal</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto text-sec">Core competencies across blockchain security, engineering, and infrastructure.</p>
         </div>
         <div class="grid md:grid-cols-3 gap-6">
           <div class="glass-card rounded-xl p-6">
-            <div class="w-10 h-10 rounded-lg accent-bg accent-border flex items-center justify-center mb-4">
+            <div class="w-10 h-10 rounded-lg icon-box tint-accent mb-4">
               <i data-lucide="shield" class="w-5 h-5 accent-text"></i>
             </div>
-            <h3 class="text-base font-semibold mb-3" style="color:var(--text-primary);">Blockchain Security</h3>
-            <p class="text-xs mb-4" style="color:var(--text-secondary);">Smart contract auditing, DeFi exploit research, and cross-chain security analysis.</p>
+            <h3 class="text-base font-semibold mb-3 text-pri">Blockchain Security</h3>
+            <p class="text-xs mb-4 text-sec">Smart contract auditing, DeFi exploit research, and cross-chain security analysis.</p>
             <div class="flex flex-wrap gap-1.5">
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Solidity</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Foundry</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Slither</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Echidna</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">EVM</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Solidity</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Foundry</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Slither</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Echidna</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">EVM</span>
             </div>
           </div>
           <div class="glass-card rounded-xl p-6">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style="background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.2);">
-              <i data-lucide="terminal" class="w-5 h-5" style="color:#14b8a6;"></i>
+            <div class="w-10 h-10 rounded-lg icon-box tint-teal mb-4">
+              <i data-lucide="terminal" class="w-5 h-5"></i>
             </div>
-            <h3 class="text-base font-semibold mb-3" style="color:var(--text-primary);">Software Engineering</h3>
-            <p class="text-xs mb-4" style="color:var(--text-secondary);">Full-stack development with modern frameworks, tooling, and infrastructure automation.</p>
+            <h3 class="text-base font-semibold mb-3 text-pri">Software Engineering</h3>
+            <p class="text-xs mb-4 text-sec">Full-stack development with modern frameworks, tooling, and infrastructure automation.</p>
             <div class="flex flex-wrap gap-1.5">
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">TypeScript</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">React</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Python</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Rust</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Go</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">TypeScript</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">React</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Python</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Rust</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Go</span>
             </div>
           </div>
           <div class="glass-card rounded-xl p-6">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style="background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);">
-              <i data-lucide="cloud" class="w-5 h-5" style="color:#818cf8;"></i>
+            <div class="w-10 h-10 rounded-lg icon-box tint-violet mb-4">
+              <i data-lucide="cloud" class="w-5 h-5"></i>
             </div>
-            <h3 class="text-base font-semibold mb-3" style="color:var(--text-primary);">Infrastructure</h3>
-            <p class="text-xs mb-4" style="color:var(--text-secondary);">Cloud architecture, automation, and scalable production deployments.</p>
+            <h3 class="text-base font-semibold mb-3 text-pri">Infrastructure</h3>
+            <p class="text-xs mb-4 text-sec">Cloud architecture, automation, and scalable production deployments.</p>
             <div class="flex flex-wrap gap-1.5">
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Docker</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">AWS</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">K8s</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">Terraform</span>
-              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono" style="background:var(--bg-glass);color:var(--text-secondary);">CI/CD</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Docker</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">AWS</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">K8s</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">Terraform</span>
+              <span class="skill-tag px-2.5 py-1 rounded-md text-[11px] font-mono">CI/CD</span>
             </div>
           </div>
         </div>
@@ -476,8 +494,8 @@
         <!-- GITHUB REPOS (LIVE FROM API) -->
         <div class="mt-16">
           <div class="flex items-center justify-between mb-8">
-            <h3 class="text-lg font-semibold" style="color:var(--text-primary);">Latest Repositories</h3>
-            <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="text-xs font-mono flex items-center gap-1 preview-link" style="color:var(--text-secondary);">
+            <h3 class="text-lg font-semibold text-pri">Latest Repositories</h3>
+            <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="text-xs font-mono flex items-center gap-1 preview-link text-sec">
               <i data-lucide="github" class="w-3 h-3"></i>
               GitHub Profile
             </a>
@@ -485,38 +503,38 @@
           <div id="github-repos" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="glass-card rounded-xl p-5">
               <div class="flex items-center gap-2 mb-3">
-                <div class="w-4 h-4 rounded-full repo-skeleton" style="background:var(--bg-glass);"></div>
-                <div class="h-4 rounded w-32 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="w-4 h-4 rounded-full repo-skeleton"></div>
+                <div class="h-4 rounded w-32 repo-skeleton"></div>
               </div>
               <div class="h-3 rounded w-full repo-skeleton mb-2" style="background:var(--bg-glass);"></div>
-              <div class="h-3 rounded w-3/4 repo-skeleton" style="background:var(--bg-glass);"></div>
+              <div class="h-3 rounded w-3/4 repo-skeleton"></div>
               <div class="flex gap-3 mt-3">
-                <div class="h-3 rounded w-16 repo-skeleton" style="background:var(--bg-glass);"></div>
-                <div class="h-3 rounded w-12 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-3 rounded w-16 repo-skeleton"></div>
+                <div class="h-3 rounded w-12 repo-skeleton"></div>
               </div>
             </div>
             <div class="glass-card rounded-xl p-5">
               <div class="flex items-center gap-2 mb-3">
-                <div class="w-4 h-4 rounded-full repo-skeleton" style="background:var(--bg-glass);"></div>
-                <div class="h-4 rounded w-28 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="w-4 h-4 rounded-full repo-skeleton"></div>
+                <div class="h-4 rounded w-28 repo-skeleton"></div>
               </div>
               <div class="h-3 rounded w-full repo-skeleton mb-2" style="background:var(--bg-glass);"></div>
-              <div class="h-3 rounded w-2/3 repo-skeleton" style="background:var(--bg-glass);"></div>
+              <div class="h-3 rounded w-2/3 repo-skeleton"></div>
               <div class="flex gap-3 mt-3">
-                <div class="h-3 rounded w-14 repo-skeleton" style="background:var(--bg-glass);"></div>
-                <div class="h-3 rounded w-10 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-3 rounded w-14 repo-skeleton"></div>
+                <div class="h-3 rounded w-10 repo-skeleton"></div>
               </div>
             </div>
             <div class="glass-card rounded-xl p-5">
               <div class="flex items-center gap-2 mb-3">
-                <div class="w-4 h-4 rounded-full repo-skeleton" style="background:var(--bg-glass);"></div>
-                <div class="h-4 rounded w-36 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="w-4 h-4 rounded-full repo-skeleton"></div>
+                <div class="h-4 rounded w-36 repo-skeleton"></div>
               </div>
               <div class="h-3 rounded w-full repo-skeleton mb-2" style="background:var(--bg-glass);"></div>
-              <div class="h-3 rounded w-4/5 repo-skeleton" style="background:var(--bg-glass);"></div>
+              <div class="h-3 rounded w-4/5 repo-skeleton"></div>
               <div class="flex gap-3 mt-3">
-                <div class="h-3 rounded w-12 repo-skeleton" style="background:var(--bg-glass);"></div>
-                <div class="h-3 rounded w-14 repo-skeleton" style="background:var(--bg-glass);"></div>
+                <div class="h-3 rounded w-12 repo-skeleton"></div>
+                <div class="h-3 rounded w-14 repo-skeleton"></div>
               </div>
             </div>
           </div>
@@ -528,49 +546,49 @@
     <section id="contact" class="py-20 lg:py-28">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-light text-xs font-mono accent-text mb-4">
+          <div class="section-badge glass-light mb-4">
             <i data-lucide="message-circle" class="w-3 h-3"></i>
             <span>Contact</span>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-bold" style="color:var(--text-primary);">Get in Touch</h2>
-          <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Security research inquiries, collaboration, or just to connect.</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-pri">Get in Touch</h2>
+          <p class="mt-4 text-sm max-w-lg mx-auto text-sec">Security research inquiries, collaboration, or just to connect.</p>
         </div>
 
         <div class="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <!-- Contact Cards -->
           <div class="space-y-4">
             <a href="mailto:adulshadega@gmail.com" class="glass-card rounded-xl p-5 flex items-center gap-4 group">
-              <div class="w-10 h-10 rounded-lg accent-bg accent-border flex items-center justify-center shrink-0">
+              <div class="w-10 h-10 rounded-lg icon-box tint-accent shrink-0">
                 <i data-lucide="mail" class="w-5 h-5 accent-text"></i>
               </div>
               <div>
-                <div class="text-sm font-medium group-hover:accent-text transition-colors" style="color:var(--text-primary);">adulshadega@gmail.com</div>
-                <div class="text-[10px]" style="color:var(--text-secondary);">Email · 24h response</div>
+                <div class="text-sm font-medium group-hover:accent-text transition-colors text-pri">adulshadega@gmail.com</div>
+                <div class="text-[10px] text-sec">Email · 24h response</div>
               </div>
             </a>
             <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="glass-card rounded-xl p-5 flex items-center gap-4 group">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.2);">
-                <i data-lucide="github" class="w-5 h-5" style="color:#14b8a6;"></i>
+              <div class="w-10 h-10 rounded-lg icon-box tint-teal shrink-0">
+                <i data-lucide="github" class="w-5 h-5"></i>
               </div>
               <div>
-                <div class="text-sm font-medium group-hover:accent-text transition-colors" style="color:var(--text-primary);">a16zcrypt0</div>
-                <div class="text-[10px]" style="color:var(--text-secondary);">GitHub · Open source</div>
+                <div class="text-sm font-medium group-hover:accent-text transition-colors text-pri">a16zcrypt0</div>
+                <div class="text-[10px] text-sec">GitHub · Open source</div>
               </div>
             </a>
             <a href="https://t.me/adulsadega" target="_blank" rel="noopener" class="glass-card rounded-xl p-5 flex items-center gap-4 group">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);">
-                <i data-lucide="send" class="w-5 h-5" style="color:#818cf8;"></i>
+              <div class="w-10 h-10 rounded-lg icon-box tint-violet shrink-0">
+                <i data-lucide="send" class="w-5 h-5"></i>
               </div>
               <div>
-                <div class="text-sm font-medium group-hover:accent-text transition-colors" style="color:var(--text-primary);">@adulsadega</div>
-                <div class="text-[10px]" style="color:var(--text-secondary);">Telegram · Fast response</div>
+                <div class="text-sm font-medium group-hover:accent-text transition-colors text-pri">@adulsadega</div>
+                <div class="text-[10px] text-sec">Telegram · Fast response</div>
               </div>
             </a>
           </div>
 
           <!-- Contact Form -->
           <div class="glass-card rounded-xl p-6 gradient-border">
-            <h3 class="text-sm font-semibold mb-4" style="color:var(--text-primary);">Send a Message</h3>
+            <h3 class="text-sm font-semibold mb-4 text-pri">Send a Message</h3>
             <form id="contact-form" action="https://formsubmit.co/adulshadega@gmail.com" method="POST" class="space-y-4" onsubmit="handleForm(event)">
               <input type="hidden" name="_subject" value="[Portfolio] New Message">
               <input type="hidden" name="_template" value="table">
@@ -599,14 +617,14 @@
   <!-- FOOTER -->
   <footer class="border-t py-8" style="border-color:var(--border-color);">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="text-xs" style="color:var(--text-secondary);opacity:0.6;">
-        &copy; 2026 <span class="font-mono" style="color:var(--text-secondary);">a16zcrypt0</span>
+      <div class="text-xs text-sec" style="opacity:0.6;">
+        &copy; 2026 <span class="font-mono text-sec">a16zcrypt0</span>
       </div>
-      <div class="flex items-center gap-1 text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.4;">
+      <div class="flex items-center gap-1 text-[10px] font-mono text-sec" style="opacity:0.4;">
         <span class="w-1.5 h-1.5 rounded-full bg-green-500/60"></span>
         <span>SYSTEM: SECURE · ONLINE</span>
       </div>
-      <div class="flex items-center gap-4 text-xs" style="color:var(--text-secondary);opacity:0.6;">
+      <div class="flex items-center gap-4 text-xs text-sec" style="opacity:0.6;">
         <a href="https://github.com/a16zcrypt0" target="_blank" rel="noopener" class="hover:accent-text transition-colors">GitHub</a>
         <span style="opacity:0.3;">|</span>
         <a href="https://t.me/adulsadega" target="_blank" rel="noopener" class="hover:accent-text transition-colors">Telegram</a>
@@ -615,33 +633,60 @@
   </footer>
 
   <script>
+  // === SHARED UTILITIES ===
+  const byId = (id) => document.getElementById(id);
+  const setText = (id, text) => { const node = byId(id); if (node) node.textContent = text; };
+  const savePref = (key, value) => localStorage.setItem(`portfolio-${key}`, value);
+  const readPref = (key) => localStorage.getItem(`portfolio-${key}`);
+  const fetchJSON = (url, options) => fetch(url, options).then(r => r.json());
+
+  // Build an element without innerHTML — every text value goes through textContent.
+  function el(tag, { className, text, style, attrs, children } = {}) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    Object.entries(style || {}).forEach(([k, v]) => { node.style[k] = v; });
+    Object.entries(attrs || {}).forEach(([k, v]) => node.setAttribute(k, v));
+    (children || []).forEach(child => node.appendChild(child));
+    return node;
+  }
+
+  const icon = (name, className) => el('i', { className, attrs: { 'data-lucide': name } });
+  const iconLabel = (name, label) => el('span', {
+    className: 'flex items-center gap-1',
+    children: [icon(name, 'w-3 h-3'), document.createTextNode(label)],
+  });
+  const renderNotice = (container, message) => {
+    container.replaceChildren(el('div', { className: 'col-span-full text-center text-sm py-8 text-sec', text: message }));
+  };
+
   // === LUCIDE INIT ===
   lucide.createIcons();
 
-  // === THEME TOGGLE ===
+  // === THEME & ACCENT ===
   function toggleTheme() {
     const html = document.documentElement;
-    const cur = html.getAttribute('data-theme');
-    const next = cur === 'dark' ? 'light' : 'dark';
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    document.getElementById('theme-icon').setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
+    byId('theme-icon').setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
     lucide.createIcons();
-    localStorage.setItem('portfolio-theme', next);
+    savePref('theme', next);
   }
+  const ACCENT_COLORS = { sky: '#38bdf8', teal: '#14b8a6', violet: '#818cf8', emerald: '#34d399' };
   function setAccent(name) {
     document.documentElement.setAttribute('data-accent', name);
     document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
-    document.querySelector(`.accent-dot[style*="${name === 'sky' ? '#38bdf8' : name === 'teal' ? '#14b8a6' : name === 'violet' ? '#818cf8' : '#34d399'}"]`).classList.add('active');
-    localStorage.setItem('portfolio-accent', name);
+    document.querySelector(`.accent-dot[style*="${ACCENT_COLORS[name]}"]`).classList.add('active');
+    savePref('accent', name);
     toggleAccentPicker();
   }
   function toggleAccentPicker() {
-    document.getElementById('accent-picker').classList.toggle('hidden');
+    byId('accent-picker').classList.toggle('hidden');
   }
   // Restore saved preferences
   (function restorePrefs() {
-    const theme = localStorage.getItem('portfolio-theme');
-    const accent = localStorage.getItem('portfolio-accent');
+    const theme = readPref('theme');
+    const accent = readPref('accent');
     if (theme) document.documentElement.setAttribute('data-theme', theme);
     if (accent) document.documentElement.setAttribute('data-accent', accent);
   })();
@@ -651,15 +696,15 @@
     const weatherIcons = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌦️',82:'🌧️',85:'🌨️',86:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
     const dlat = -6.2088, dlon = 106.8456, dcity = 'Jakarta';
     function fw(lat, lon, city) {
-      document.getElementById('weather-location').textContent = city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weathercode,wind_speed_10m&timezone=auto`)
-        .then(r => r.json()).then(d => {
+      setText('weather-location', city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`);
+      fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weathercode,wind_speed_10m&timezone=auto`)
+        .then(d => {
           const c = d.current;
-          document.getElementById('weather-temp').textContent = `${Math.round(c.temperature_2m)}°C`;
-          document.getElementById('weather-humidity').textContent = `${c.relative_humidity_2m}%`;
-          document.getElementById('weather-wind').textContent = `${Math.round(c.wind_speed_10m)} km/h`;
-          document.getElementById('weather-icon').textContent = weatherIcons[c.weathercode] || '🌤️';
-          document.getElementById('weather-desc').textContent = 'Live · Updated now';
+          setText('weather-temp', `${Math.round(c.temperature_2m)}°C`);
+          setText('weather-humidity', `${c.relative_humidity_2m}%`);
+          setText('weather-wind', `${Math.round(c.wind_speed_10m)} km/h`);
+          setText('weather-icon', weatherIcons[c.weathercode] || '🌤️');
+          setText('weather-desc', 'Live · Updated now');
         }).catch(() => { /* keep defaults */ });
     }
     if (navigator.geolocation) {
@@ -670,190 +715,128 @@
   // === NETWORK (privacy-safe — no third-party IP lookup) ===
   (function getNetwork() {
     const ua = navigator.userAgent;
-    let browser = 'Other', os = 'Unknown';
-    if (ua.includes('Firefox')) browser='Firefox'; else if (ua.includes('Edge')) browser='Edge';
-    else if (ua.includes('Chrome')) browser='Chrome'; else if (ua.includes('Safari')) browser='Safari';
-    if (ua.includes('Windows')) os='Windows'; else if (ua.includes('Mac')) os='macOS';
-    else if (ua.includes('Linux')) os='Linux'; else if (ua.includes('Android')) os='Android';
-    else if (ua.includes('iPhone')||ua.includes('iPad')) os='iOS';
-    document.getElementById('network-browser').textContent = `${browser} · ${os}`;
+    const match = (pairs, fallback) => (pairs.find(([needle]) => ua.includes(needle)) || [null, fallback])[1];
+    const browser = match([['Firefox','Firefox'],['Edge','Edge'],['Chrome','Chrome'],['Safari','Safari']], 'Other');
+    const os = match([['Windows','Windows'],['Mac','macOS'],['Linux','Linux'],['Android','Android'],['iPhone','iOS'],['iPad','iOS']], 'Unknown');
+    setText('network-browser', `${browser} · ${os}`);
     // Display browser/OS only — no IP/ISP lookup (privacy)
-    document.getElementById('network-ip').textContent = '🔒 Private';
-    document.getElementById('network-isp').textContent = 'Hidden';
-    document.getElementById('network-country').textContent = 'Protected';
+    setText('network-ip', '🔒 Private');
+    setText('network-isp', 'Hidden');
+    setText('network-country', 'Protected');
   })();
 
   // === VISIT COUNTER (countapi.xyz) ===
   (function getCounter() {
-    const key = 'portfolio-' + Date.now().toString(36);
-    // Try to get total hits
-    fetch('https://api.countapi.xyz/get/a16zcrypt0/portfolio')
-      .then(r => r.json()).then(d => {
-        if (d.value !== undefined) {
-          document.getElementById('counter-value').textContent = d.value.toLocaleString();
-        }
-      }).catch(() => {
-        document.getElementById('counter-value').textContent = '--';
-      });
+    const showCount = (d) => { if (d.value !== undefined) setText('counter-value', d.value.toLocaleString()); };
+    fetchJSON('https://api.countapi.xyz/get/a16zcrypt0/portfolio')
+      .then(showCount)
+      .catch(() => setText('counter-value', '--'));
     // Hit (increment)
-    fetch('https://api.countapi.xyz/hit/a16zcrypt0/portfolio')
-      .then(r => r.json()).then(d => {
-        if (d.value !== undefined) {
-          document.getElementById('counter-value').textContent = d.value.toLocaleString();
-        }
-      }).catch(() => {});
+    fetchJSON('https://api.countapi.xyz/hit/a16zcrypt0/portfolio')
+      .then(showCount)
+      .catch(() => {});
   })();
 
   // === GITHUB REPOS (Live API) — XSS-safe via DOM API ===
   (function getGitHubRepos() {
-    const container = document.getElementById('github-repos');
-    fetch('https://api.github.com/users/a16zcrypt0/repos?sort=updated&per_page=6&type=public')
-      .then(r => r.json()).then(repos => {
+    const LANG_COLORS = {Solidity:'#363636',TypeScript:'#3178c6',JavaScript:'#f1e05a',Python:'#3572A5',Rust:'#dea584',Go:'#00ADD8',Shell:'#89e051',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Dockerfile:'#384d54',Move:'#4a76a8',Cairo:'#ff4f00'};
+    const DEFAULT_LANG_COLOR = '#6b7280';
+    const container = byId('github-repos');
+
+    function repoCard(repo) {
+      const lang = repo.language || 'Unknown';
+      const header = el('div', {
+        className: 'flex items-center gap-2 mb-3',
+        children: [
+          icon('book', 'w-4 h-4 shrink-0 accent-text'),
+          el('span', { className: 'text-sm font-medium group-hover:accent-text transition-colors truncate text-pri', text: repo.name }),
+        ],
+      });
+      const description = el('p', {
+        className: 'text-xs leading-relaxed line-clamp-2 text-sec',
+        text: repo.description || 'No description available.',
+      });
+      const language = el('span', {
+        className: 'flex items-center gap-1',
+        children: [
+          el('span', { className: 'w-2 h-2 rounded-full', style: { background: LANG_COLORS[lang] || DEFAULT_LANG_COLOR, display: 'inline-block' } }),
+          document.createTextNode(lang),
+        ],
+      });
+      const meta = el('div', {
+        className: 'flex items-center gap-4 mt-3 text-[10px] font-mono text-sec',
+        style: { opacity: '0.7' },
+        children: [
+          language,
+          iconLabel('star', repo.stargazers_count || 0),
+          iconLabel('git-fork', repo.forks_count || 0),
+          el('span', { style: { marginLeft: 'auto' }, text: new Date(repo.updated_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) }),
+        ],
+      });
+      return el('a', {
+        className: 'glass-card rounded-xl p-5 group',
+        attrs: { href: repo.html_url, target: '_blank', rel: 'noopener' },
+        children: [header, description, meta],
+      });
+    }
+
+    fetchJSON('https://api.github.com/users/a16zcrypt0/repos?sort=updated&per_page=6&type=public')
+      .then(repos => {
         if (!Array.isArray(repos) || repos.length === 0) {
-          container.textContent = '';
-          const empty = document.createElement('div');
-          empty.className = 'col-span-full text-center text-sm py-8';
-          empty.style.color = 'var(--text-secondary)';
-          empty.textContent = 'No public repositories yet.';
-          container.appendChild(empty);
+          renderNotice(container, 'No public repositories yet.');
           return;
         }
-        const langColors = {Solidity:'#363636',TypeScript:'#3178c6',JavaScript:'#f1e05a',Python:'#3572A5',Rust:'#dea584',Go:'#00ADD8',Shell:'#89e051',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Dockerfile:'#384d54',Move:'#4a76a8',Cairo:'#ff4f00'};
-        const DEFAULT_LANG_COLOR = '#6b7280';
-        container.textContent = '';
-        repos.forEach(repo => {
-          const lang = repo.language || 'Unknown';
-          const langColor = langColors[lang] || DEFAULT_LANG_COLOR;
-          const desc = repo.description || 'No description available.';
-          const stars = repo.stargazers_count || 0;
-          const forks = repo.forks_count || 0;
-          const updated = new Date(repo.updated_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-
-          // Build with DOM API — no innerHTML, all text via textContent
-          const card = document.createElement('a');
-          card.href = repo.html_url;
-          card.target = '_blank';
-          card.rel = 'noopener';
-          card.className = 'glass-card rounded-xl p-5 group';
-
-          const header = document.createElement('div');
-          header.className = 'flex items-center gap-2 mb-3';
-          const icon = document.createElement('i');
-          icon.setAttribute('data-lucide', 'book');
-          icon.className = 'w-4 h-4 shrink-0';
-          icon.style.color = 'var(--accent)';
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'text-sm font-medium group-hover:accent-text transition-colors truncate';
-          nameSpan.style.color = 'var(--text-primary)';
-          nameSpan.textContent = repo.name; // safe
-          header.appendChild(icon);
-          header.appendChild(nameSpan);
-
-          const descP = document.createElement('p');
-          descP.className = 'text-xs leading-relaxed line-clamp-2';
-          descP.style.color = 'var(--text-secondary)';
-          descP.textContent = desc; // safe
-
-          const meta = document.createElement('div');
-          meta.className = 'flex items-center gap-4 mt-3 text-[10px] font-mono';
-          meta.style.color = 'var(--text-secondary)';
-          meta.style.opacity = '0.7';
-
-          const langSpan = document.createElement('span');
-          langSpan.className = 'flex items-center gap-1';
-          const dot = document.createElement('span');
-          dot.className = 'w-2 h-2 rounded-full';
-          dot.style.background = langColor;
-          dot.style.display = 'inline-block';
-          langSpan.appendChild(dot);
-          langSpan.appendChild(document.createTextNode(lang));
-
-          const starSpan = document.createElement('span');
-          starSpan.className = 'flex items-center gap-1';
-          const starIcon = document.createElement('i');
-          starIcon.setAttribute('data-lucide', 'star');
-          starIcon.className = 'w-3 h-3';
-          starSpan.appendChild(starIcon);
-          starSpan.appendChild(document.createTextNode(stars));
-
-          const forkSpan = document.createElement('span');
-          forkSpan.className = 'flex items-center gap-1';
-          const forkIcon = document.createElement('i');
-          forkIcon.setAttribute('data-lucide', 'git-fork');
-          forkIcon.className = 'w-3 h-3';
-          forkSpan.appendChild(forkIcon);
-          forkSpan.appendChild(document.createTextNode(forks));
-
-          const dateSpan = document.createElement('span');
-          dateSpan.style.marginLeft = 'auto';
-          dateSpan.textContent = updated;
-
-          meta.appendChild(langSpan);
-          meta.appendChild(starSpan);
-          meta.appendChild(forkSpan);
-          meta.appendChild(dateSpan);
-
-          card.appendChild(header);
-          card.appendChild(descP);
-          card.appendChild(meta);
-          container.appendChild(card);
-        });
+        container.replaceChildren(...repos.map(repoCard));
         lucide.createIcons();
-      }).catch(() => {
-        container.textContent = '';
-        const fail = document.createElement('div');
-        fail.className = 'col-span-full text-center text-sm py-8';
-        fail.style.color = 'var(--text-secondary)';
-        fail.textContent = 'Failed to load repositories.';
-        container.appendChild(fail);
-      });
+      })
+      .catch(() => renderNotice(container, 'Failed to load repositories.'));
   })();
 
   // === CONTACT FORM ===
   function handleForm(e) {
     e.preventDefault();
-    const btn = document.getElementById('form-submit-btn');
-    const status = document.getElementById('form-status');
-    const form = document.getElementById('contact-form');
-    btn.disabled = true;
-    btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Sending...';
-    status.style.display = 'none';
-    lucide.createIcons();
+    const btn = byId('form-submit-btn');
+    const status = byId('form-status');
+    const form = byId('contact-form');
 
-    fetch(form.action, {
+    const setButton = (iconName, label, disabled) => {
+      btn.disabled = disabled;
+      btn.replaceChildren(icon(iconName, disabled ? 'w-4 h-4 animate-spin' : 'w-4 h-4'), document.createTextNode(` ${label}`));
+      lucide.createIcons();
+    };
+    const showStatus = (message, color) => {
+      status.textContent = message;
+      status.style.color = color;
+      status.style.display = 'block';
+    };
+
+    setButton('loader', 'Sending...', true);
+    status.style.display = 'none';
+
+    fetchJSON(form.action, {
       method: 'POST',
       body: new FormData(form),
       headers: {'Accept': 'application/json'}
     })
-    .then(r => r.json())
     .then(data => {
       if (data.success) {
-        status.textContent = '✓ Message sent successfully!';
-        status.style.color = '#34d399';
+        showStatus('✓ Message sent successfully!', '#34d399');
         form.reset();
       } else {
-        status.textContent = '✗ Failed to send. Email me directly instead.';
-        status.style.color = '#f87171';
+        showStatus('✗ Failed to send. Email me directly instead.', '#f87171');
       }
-      status.style.display = 'block';
     })
-    .catch(() => {
-      status.textContent = '✗ Network error. Please email me directly.';
-      status.style.color = '#f87171';
-      status.style.display = 'block';
-    })
+    .catch(() => showStatus('✗ Network error. Please email me directly.', '#f87171'))
     .finally(() => {
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Send Message';
-      lucide.createIcons();
+      setButton('send', 'Send Message', false);
       setTimeout(() => { status.style.display = 'none'; }, 5000);
     });
   }
 
   // Click outside to close accent picker
   document.addEventListener('click', function(e) {
-    const picker = document.getElementById('accent-picker');
-    const btn = document.getElementById('accent-btn');
+    const picker = byId('accent-picker');
+    const btn = byId('accent-btn');
     if (!picker.classList.contains('hidden') && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
       picker.classList.add('hidden');
     }
