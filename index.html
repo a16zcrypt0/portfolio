@@ -8,8 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Play CDN pinned to an exact version; it is not served with CORS headers, so SRI cannot be applied. -->
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM" crossorigin="anonymous"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -311,7 +312,7 @@
                 <i data-lucide="activity" class="w-4 h-4" style="color:#14b8a6;"></i>
                 <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Visitor</span>
               </div>
-              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">ip-api.com</span>
+              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">local</span>
             </div>
             <div id="network-content" class="space-y-2.5">
               <div class="flex items-center gap-3 pb-2.5 border-b" style="border-color:var(--border-color);">
@@ -341,7 +342,7 @@
                 <i data-lucide="bar-chart-3" class="w-4 h-4" style="color:#818cf8;"></i>
                 <span class="text-xs font-mono uppercase tracking-wider" style="color:var(--text-secondary);">Traffic</span>
               </div>
-              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">countapi</span>
+              <span class="text-[10px] font-mono" style="color:var(--text-secondary);opacity:0.5;">local</span>
             </div>
             <div id="counter-content" class="flex flex-col items-center justify-center py-3">
               <div class="w-10 h-10 rounded-lg" style="background:rgba(129,140,248,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
@@ -371,7 +372,7 @@
           <p class="mt-4 text-sm max-w-lg mx-auto" style="color:var(--text-secondary);">Technical deep-dives into vulnerabilities, exploits, and blockchain security research.</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
+          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank','noopener,noreferrer')">
             <div class="flex items-center gap-2 mb-3">
               <span class="text-lg">🔴</span>
               <span class="text-sm font-semibold" style="color:var(--text-primary);">Critical Reentrancy in DeFi</span>
@@ -382,7 +383,7 @@
               <span style="color:var(--text-secondary);opacity:0.5;">2026</span>
             </div>
           </div>
-          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
+          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank','noopener,noreferrer')">
             <div class="flex items-center gap-2 mb-3">
               <span class="text-lg">🟠</span>
               <span class="text-sm font-semibold" style="color:var(--text-primary);">Oracle Manipulation 101</span>
@@ -393,7 +394,7 @@
               <span style="color:var(--text-secondary);opacity:0.5;">2026</span>
             </div>
           </div>
-          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank')">
+          <div class="glass-card rounded-xl p-5 group cursor-pointer" onclick="window.open('https://medium.com','_blank','noopener,noreferrer')">
             <div class="flex items-center gap-2 mb-3">
               <span class="text-lg">🔵</span>
               <span class="text-sm font-semibold" style="color:var(--text-primary);">Cross-chain Bridge Attacks</span>
@@ -683,25 +684,18 @@
     document.getElementById('network-country').textContent = 'Protected';
   })();
 
-  // === VISIT COUNTER (countapi.xyz) ===
+  // === VISIT COUNTER (local only — no third-party tracking service) ===
   (function getCounter() {
-    const key = 'portfolio-' + Date.now().toString(36);
-    // Try to get total hits
-    fetch('https://api.countapi.xyz/get/a16zcrypt0/portfolio')
-      .then(r => r.json()).then(d => {
-        if (d.value !== undefined) {
-          document.getElementById('counter-value').textContent = d.value.toLocaleString();
-        }
-      }).catch(() => {
-        document.getElementById('counter-value').textContent = '--';
-      });
-    // Hit (increment)
-    fetch('https://api.countapi.xyz/hit/a16zcrypt0/portfolio')
-      .then(r => r.json()).then(d => {
-        if (d.value !== undefined) {
-          document.getElementById('counter-value').textContent = d.value.toLocaleString();
-        }
-      }).catch(() => {});
+    const today = new Date().toISOString().slice(0, 10);
+    const total = (parseInt(localStorage.getItem('portfolio-visits-total'), 10) || 0) + 1;
+    const todayCount = localStorage.getItem('portfolio-visits-date') === today
+      ? (parseInt(localStorage.getItem('portfolio-visits-today'), 10) || 0) + 1
+      : 1;
+    localStorage.setItem('portfolio-visits-total', String(total));
+    localStorage.setItem('portfolio-visits-today', String(todayCount));
+    localStorage.setItem('portfolio-visits-date', today);
+    document.getElementById('counter-value').textContent = total.toLocaleString();
+    document.getElementById('counter-today').textContent = `Today: ${todayCount}`;
   })();
 
   // === GITHUB REPOS (Live API) — XSS-safe via DOM API ===
@@ -731,7 +725,7 @@
 
           // Build with DOM API — no innerHTML, all text via textContent
           const card = document.createElement('a');
-          card.href = repo.html_url;
+          card.href = /^https:\/\/github\.com\//.test(repo.html_url || '') ? repo.html_url : '#';
           card.target = '_blank';
           card.rel = 'noopener';
           card.className = 'glass-card rounded-xl p-5 group';

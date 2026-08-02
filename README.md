@@ -8,7 +8,6 @@ Personal portfolio website — **Tech · AI · Cybersecurity**
 ## Tech Stack
 - Next.js + Tailwind CSS
 - Open-Meteo API (weather)
-- ip-api.com (network info)
 - FormSubmit (contact)
 
 ## Features
