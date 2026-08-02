@@ -11,15 +11,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
+    if (typeof tailwind === 'undefined') {
+      console.error('[portfolio] Tailwind CDN failed to load; site will render unstyled.');
+    } else {
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
           },
         },
-      },
+      }
     }
   </script>
   <style>
@@ -615,8 +619,87 @@
   </footer>
 
   <script>
+  // === SHARED HELPERS ===
+  const LOG_PREFIX = '[portfolio]';
+  function logError(context, err) {
+    console.error(`${LOG_PREFIX} ${context}:`, err);
+  }
+  // Runs a widget initialiser in isolation so one failure cannot abort the rest of the script.
+  function runWidget(name, fn) {
+    try {
+      const result = fn();
+      if (result && typeof result.catch === 'function') {
+        result.catch(err => logError(`${name} failed`, err));
+      }
+    } catch (err) {
+      logError(`${name} failed to initialise`, err);
+    }
+  }
+  function byId(id) {
+    const el = document.getElementById(id);
+    if (!el) logError('missing element', new Error(`#${id} not found in DOM`));
+    return el;
+  }
+  function setText(id, text) {
+    const el = byId(id);
+    if (el) el.textContent = text;
+    return el;
+  }
+  // lucide is loaded from a CDN; a failed load must not break every other feature.
+  function renderIcons() {
+    if (typeof lucide === 'undefined' || typeof lucide.createIcons !== 'function') {
+      logError('icons unavailable', new Error('lucide failed to load from CDN'));
+      return;
+    }
+    try {
+      lucide.createIcons();
+    } catch (err) {
+      logError('icon rendering failed', err);
+    }
+  }
+  // localStorage throws in private mode / when the quota is exceeded.
+  const storage = {
+    get(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (err) {
+        logError(`could not read "${key}" from localStorage`, err);
+        return null;
+      }
+    },
+    set(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (err) {
+        logError(`could not persist "${key}" to localStorage`, err);
+        return false;
+      }
+    }
+  };
+  // Fetch JSON with an explicit timeout, HTTP status check and parse-error reporting.
+  async function fetchJSON(url, { timeout = 8000, ...options } = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    let res;
+    try {
+      res = await fetch(url, { ...options, signal: controller.signal });
+    } catch (err) {
+      if (err.name === 'AbortError') throw new Error(`Request to ${url} timed out after ${timeout}ms`);
+      throw new Error(`Network request to ${url} failed: ${err.message}`);
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!res.ok) throw new Error(`Request to ${url} failed with HTTP ${res.status} ${res.statusText}`);
+    try {
+      return await res.json();
+    } catch (err) {
+      throw new Error(`Response from ${url} was not valid JSON: ${err.message}`);
+    }
+  }
+
   // === LUCIDE INIT ===
-  lucide.createIcons();
+  renderIcons();
 
   // === THEME TOGGLE ===
   function toggleTheme() {
@@ -624,51 +707,77 @@
     const cur = html.getAttribute('data-theme');
     const next = cur === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    document.getElementById('theme-icon').setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
-    lucide.createIcons();
-    localStorage.setItem('portfolio-theme', next);
+    const icon = byId('theme-icon');
+    if (icon) icon.setAttribute('data-lucide', next === 'dark' ? 'moon' : 'sun');
+    renderIcons();
+    storage.set('portfolio-theme', next);
   }
+  const ACCENT_SWATCHES = {sky:'#38bdf8', teal:'#14b8a6', violet:'#818cf8', emerald:'#34d399'};
   function setAccent(name) {
+    const swatch = ACCENT_SWATCHES[name];
+    if (!swatch) {
+      logError('unknown accent requested', new Error(`"${name}" is not a known accent`));
+      return;
+    }
     document.documentElement.setAttribute('data-accent', name);
     document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
-    document.querySelector(`.accent-dot[style*="${name === 'sky' ? '#38bdf8' : name === 'teal' ? '#14b8a6' : name === 'violet' ? '#818cf8' : '#34d399'}"]`).classList.add('active');
-    localStorage.setItem('portfolio-accent', name);
+    const dot = document.querySelector(`.accent-dot[style*="${swatch}"]`);
+    if (dot) dot.classList.add('active');
+    else logError('accent dot not found', new Error(`no .accent-dot for ${name} (${swatch})`));
+    storage.set('portfolio-accent', name);
     toggleAccentPicker();
   }
   function toggleAccentPicker() {
-    document.getElementById('accent-picker').classList.toggle('hidden');
+    const picker = byId('accent-picker');
+    if (picker) picker.classList.toggle('hidden');
   }
   // Restore saved preferences
-  (function restorePrefs() {
-    const theme = localStorage.getItem('portfolio-theme');
-    const accent = localStorage.getItem('portfolio-accent');
+  runWidget('preference restore', function restorePrefs() {
+    const theme = storage.get('portfolio-theme');
+    const accent = storage.get('portfolio-accent');
     if (theme) document.documentElement.setAttribute('data-theme', theme);
-    if (accent) document.documentElement.setAttribute('data-accent', accent);
-  })();
+    if (accent && ACCENT_SWATCHES[accent]) document.documentElement.setAttribute('data-accent', accent);
+  });
 
   // === WEATHER ===
-  (function getWeather() {
+  runWidget('weather', function getWeather() {
     const weatherIcons = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌦️',82:'🌧️',85:'🌨️',86:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
     const dlat = -6.2088, dlon = 106.8456, dcity = 'Jakarta';
-    function fw(lat, lon, city) {
-      document.getElementById('weather-location').textContent = city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weathercode,wind_speed_10m&timezone=auto`)
-        .then(r => r.json()).then(d => {
-          const c = d.current;
-          document.getElementById('weather-temp').textContent = `${Math.round(c.temperature_2m)}°C`;
-          document.getElementById('weather-humidity').textContent = `${c.relative_humidity_2m}%`;
-          document.getElementById('weather-wind').textContent = `${Math.round(c.wind_speed_10m)} km/h`;
-          document.getElementById('weather-icon').textContent = weatherIcons[c.weathercode] || '🌤️';
-          document.getElementById('weather-desc').textContent = 'Live · Updated now';
-        }).catch(() => { /* keep defaults */ });
+    async function fw(lat, lon, city) {
+      setText('weather-location', city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`);
+      try {
+        const d = await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weathercode,wind_speed_10m&timezone=auto`);
+        const c = d && d.current;
+        if (!c || typeof c.temperature_2m !== 'number') {
+          throw new Error('weather response is missing the "current" measurements');
+        }
+        setText('weather-temp', `${Math.round(c.temperature_2m)}°C`);
+        setText('weather-humidity', `${c.relative_humidity_2m}%`);
+        setText('weather-wind', `${Math.round(c.wind_speed_10m)} km/h`);
+        setText('weather-icon', weatherIcons[c.weathercode] || '🌤️');
+        setText('weather-desc', 'Live · Updated now');
+      } catch (err) {
+        logError('weather lookup failed', err);
+        setText('weather-desc', 'Weather unavailable');
+      }
     }
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(p => fw(p.coords.latitude, p.coords.longitude), () => fw(dlat, dlon, dcity), {timeout:5000});
-    } else { fw(dlat, dlon, dcity); }
-  })();
+      navigator.geolocation.getCurrentPosition(
+        p => fw(p.coords.latitude, p.coords.longitude),
+        err => {
+          logError('geolocation denied or unavailable, using default location', err);
+          fw(dlat, dlon, dcity);
+        },
+        {timeout:5000}
+      );
+    } else {
+      logError('geolocation unsupported, using default location', new Error('navigator.geolocation is undefined'));
+      fw(dlat, dlon, dcity);
+    }
+  });
 
   // === NETWORK (privacy-safe — no third-party IP lookup) ===
-  (function getNetwork() {
+  runWidget('network info', function getNetwork() {
     const ua = navigator.userAgent;
     let browser = 'Other', os = 'Unknown';
     if (ua.includes('Firefox')) browser='Firefox'; else if (ua.includes('Edge')) browser='Edge';
@@ -676,184 +785,196 @@
     if (ua.includes('Windows')) os='Windows'; else if (ua.includes('Mac')) os='macOS';
     else if (ua.includes('Linux')) os='Linux'; else if (ua.includes('Android')) os='Android';
     else if (ua.includes('iPhone')||ua.includes('iPad')) os='iOS';
-    document.getElementById('network-browser').textContent = `${browser} · ${os}`;
+    setText('network-browser', `${browser} · ${os}`);
     // Display browser/OS only — no IP/ISP lookup (privacy)
-    document.getElementById('network-ip').textContent = '🔒 Private';
-    document.getElementById('network-isp').textContent = 'Hidden';
-    document.getElementById('network-country').textContent = 'Protected';
-  })();
+    setText('network-ip', '🔒 Private');
+    setText('network-isp', 'Hidden');
+    setText('network-country', 'Protected');
+  });
 
   // === VISIT COUNTER (countapi.xyz) ===
-  (function getCounter() {
-    const key = 'portfolio-' + Date.now().toString(36);
-    // Try to get total hits
-    fetch('https://api.countapi.xyz/get/a16zcrypt0/portfolio')
-      .then(r => r.json()).then(d => {
-        if (d.value !== undefined) {
-          document.getElementById('counter-value').textContent = d.value.toLocaleString();
+  runWidget('visit counter', async function getCounter() {
+    // Increment first, then fall back to a plain read; the two calls are sequential so a
+    // slow response cannot overwrite a fresher value.
+    const endpoints = [
+      'https://api.countapi.xyz/hit/a16zcrypt0/portfolio',
+      'https://api.countapi.xyz/get/a16zcrypt0/portfolio'
+    ];
+    for (const url of endpoints) {
+      try {
+        const d = await fetchJSON(url);
+        if (typeof d.value !== 'number') {
+          throw new Error(`counter response has no numeric "value" field`);
         }
-      }).catch(() => {
-        document.getElementById('counter-value').textContent = '--';
-      });
-    // Hit (increment)
-    fetch('https://api.countapi.xyz/hit/a16zcrypt0/portfolio')
-      .then(r => r.json()).then(d => {
-        if (d.value !== undefined) {
-          document.getElementById('counter-value').textContent = d.value.toLocaleString();
-        }
-      }).catch(() => {});
-  })();
+        setText('counter-value', d.value.toLocaleString());
+        return;
+      } catch (err) {
+        logError('visit counter request failed', err);
+      }
+    }
+    setText('counter-value', '--');
+  });
 
   // === GITHUB REPOS (Live API) — XSS-safe via DOM API ===
-  (function getGitHubRepos() {
-    const container = document.getElementById('github-repos');
-    fetch('https://api.github.com/users/a16zcrypt0/repos?sort=updated&per_page=6&type=public')
-      .then(r => r.json()).then(repos => {
-        if (!Array.isArray(repos) || repos.length === 0) {
-          container.textContent = '';
-          const empty = document.createElement('div');
-          empty.className = 'col-span-full text-center text-sm py-8';
-          empty.style.color = 'var(--text-secondary)';
-          empty.textContent = 'No public repositories yet.';
-          container.appendChild(empty);
-          return;
-        }
-        const langColors = {Solidity:'#363636',TypeScript:'#3178c6',JavaScript:'#f1e05a',Python:'#3572A5',Rust:'#dea584',Go:'#00ADD8',Shell:'#89e051',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Dockerfile:'#384d54',Move:'#4a76a8',Cairo:'#ff4f00'};
-        const DEFAULT_LANG_COLOR = '#6b7280';
-        container.textContent = '';
-        repos.forEach(repo => {
-          const lang = repo.language || 'Unknown';
-          const langColor = langColors[lang] || DEFAULT_LANG_COLOR;
-          const desc = repo.description || 'No description available.';
-          const stars = repo.stargazers_count || 0;
-          const forks = repo.forks_count || 0;
-          const updated = new Date(repo.updated_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  runWidget('github repos', async function getGitHubRepos() {
+    const container = byId('github-repos');
+    if (!container) return;
+    function showMessage(text) {
+      container.textContent = '';
+      const msg = document.createElement('div');
+      msg.className = 'col-span-full text-center text-sm py-8';
+      msg.style.color = 'var(--text-secondary)';
+      msg.textContent = text;
+      container.appendChild(msg);
+    }
+    try {
+      const repos = await fetchJSON('https://api.github.com/users/a16zcrypt0/repos?sort=updated&per_page=6&type=public');
+      if (!Array.isArray(repos)) {
+        // A non-array payload means GitHub returned an error object (rate limit, not found, ...).
+        throw new Error(`unexpected GitHub payload: ${repos && repos.message ? repos.message : typeof repos}`);
+      }
+      if (repos.length === 0) {
+        showMessage('No public repositories yet.');
+        return;
+      }
+      const langColors = {Solidity:'#363636',TypeScript:'#3178c6',JavaScript:'#f1e05a',Python:'#3572A5',Rust:'#dea584',Go:'#00ADD8',Shell:'#89e051',HTML:'#e34c26',CSS:'#563d7c',Vue:'#41b883',Dockerfile:'#384d54',Move:'#4a76a8',Cairo:'#ff4f00'};
+      const DEFAULT_LANG_COLOR = '#6b7280';
+      container.textContent = '';
+      repos.forEach(repo => {
+        const lang = repo.language || 'Unknown';
+        const langColor = langColors[lang] || DEFAULT_LANG_COLOR;
+        const desc = repo.description || 'No description available.';
+        const stars = repo.stargazers_count || 0;
+        const forks = repo.forks_count || 0;
+        const updatedAt = new Date(repo.updated_at);
+        const updated = Number.isNaN(updatedAt.getTime())
+          ? 'Unknown date'
+          : updatedAt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
 
-          // Build with DOM API — no innerHTML, all text via textContent
-          const card = document.createElement('a');
-          card.href = repo.html_url;
-          card.target = '_blank';
-          card.rel = 'noopener';
-          card.className = 'glass-card rounded-xl p-5 group';
+        // Build with DOM API — no innerHTML, all text via textContent
+        const card = document.createElement('a');
+        card.href = repo.html_url;
+        card.target = '_blank';
+        card.rel = 'noopener';
+        card.className = 'glass-card rounded-xl p-5 group';
 
-          const header = document.createElement('div');
-          header.className = 'flex items-center gap-2 mb-3';
-          const icon = document.createElement('i');
-          icon.setAttribute('data-lucide', 'book');
-          icon.className = 'w-4 h-4 shrink-0';
-          icon.style.color = 'var(--accent)';
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'text-sm font-medium group-hover:accent-text transition-colors truncate';
-          nameSpan.style.color = 'var(--text-primary)';
-          nameSpan.textContent = repo.name; // safe
-          header.appendChild(icon);
-          header.appendChild(nameSpan);
+        const header = document.createElement('div');
+        header.className = 'flex items-center gap-2 mb-3';
+        const icon = document.createElement('i');
+        icon.setAttribute('data-lucide', 'book');
+        icon.className = 'w-4 h-4 shrink-0';
+        icon.style.color = 'var(--accent)';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'text-sm font-medium group-hover:accent-text transition-colors truncate';
+        nameSpan.style.color = 'var(--text-primary)';
+        nameSpan.textContent = repo.name; // safe
+        header.appendChild(icon);
+        header.appendChild(nameSpan);
 
-          const descP = document.createElement('p');
-          descP.className = 'text-xs leading-relaxed line-clamp-2';
-          descP.style.color = 'var(--text-secondary)';
-          descP.textContent = desc; // safe
+        const descP = document.createElement('p');
+        descP.className = 'text-xs leading-relaxed line-clamp-2';
+        descP.style.color = 'var(--text-secondary)';
+        descP.textContent = desc; // safe
 
-          const meta = document.createElement('div');
-          meta.className = 'flex items-center gap-4 mt-3 text-[10px] font-mono';
-          meta.style.color = 'var(--text-secondary)';
-          meta.style.opacity = '0.7';
+        const meta = document.createElement('div');
+        meta.className = 'flex items-center gap-4 mt-3 text-[10px] font-mono';
+        meta.style.color = 'var(--text-secondary)';
+        meta.style.opacity = '0.7';
 
-          const langSpan = document.createElement('span');
-          langSpan.className = 'flex items-center gap-1';
-          const dot = document.createElement('span');
-          dot.className = 'w-2 h-2 rounded-full';
-          dot.style.background = langColor;
-          dot.style.display = 'inline-block';
-          langSpan.appendChild(dot);
-          langSpan.appendChild(document.createTextNode(lang));
+        const langSpan = document.createElement('span');
+        langSpan.className = 'flex items-center gap-1';
+        const dot = document.createElement('span');
+        dot.className = 'w-2 h-2 rounded-full';
+        dot.style.background = langColor;
+        dot.style.display = 'inline-block';
+        langSpan.appendChild(dot);
+        langSpan.appendChild(document.createTextNode(lang));
 
-          const starSpan = document.createElement('span');
-          starSpan.className = 'flex items-center gap-1';
-          const starIcon = document.createElement('i');
-          starIcon.setAttribute('data-lucide', 'star');
-          starIcon.className = 'w-3 h-3';
-          starSpan.appendChild(starIcon);
-          starSpan.appendChild(document.createTextNode(stars));
+        const starSpan = document.createElement('span');
+        starSpan.className = 'flex items-center gap-1';
+        const starIcon = document.createElement('i');
+        starIcon.setAttribute('data-lucide', 'star');
+        starIcon.className = 'w-3 h-3';
+        starSpan.appendChild(starIcon);
+        starSpan.appendChild(document.createTextNode(stars));
 
-          const forkSpan = document.createElement('span');
-          forkSpan.className = 'flex items-center gap-1';
-          const forkIcon = document.createElement('i');
-          forkIcon.setAttribute('data-lucide', 'git-fork');
-          forkIcon.className = 'w-3 h-3';
-          forkSpan.appendChild(forkIcon);
-          forkSpan.appendChild(document.createTextNode(forks));
+        const forkSpan = document.createElement('span');
+        forkSpan.className = 'flex items-center gap-1';
+        const forkIcon = document.createElement('i');
+        forkIcon.setAttribute('data-lucide', 'git-fork');
+        forkIcon.className = 'w-3 h-3';
+        forkSpan.appendChild(forkIcon);
+        forkSpan.appendChild(document.createTextNode(forks));
 
-          const dateSpan = document.createElement('span');
-          dateSpan.style.marginLeft = 'auto';
-          dateSpan.textContent = updated;
+        const dateSpan = document.createElement('span');
+        dateSpan.style.marginLeft = 'auto';
+        dateSpan.textContent = updated;
 
-          meta.appendChild(langSpan);
-          meta.appendChild(starSpan);
-          meta.appendChild(forkSpan);
-          meta.appendChild(dateSpan);
+        meta.appendChild(langSpan);
+        meta.appendChild(starSpan);
+        meta.appendChild(forkSpan);
+        meta.appendChild(dateSpan);
 
-          card.appendChild(header);
-          card.appendChild(descP);
-          card.appendChild(meta);
-          container.appendChild(card);
-        });
-        lucide.createIcons();
-      }).catch(() => {
-        container.textContent = '';
-        const fail = document.createElement('div');
-        fail.className = 'col-span-full text-center text-sm py-8';
-        fail.style.color = 'var(--text-secondary)';
-        fail.textContent = 'Failed to load repositories.';
-        container.appendChild(fail);
+        card.appendChild(header);
+        card.appendChild(descP);
+        card.appendChild(meta);
+        container.appendChild(card);
       });
-  })();
+      renderIcons();
+    } catch (err) {
+      logError('GitHub repository fetch failed', err);
+      showMessage('Failed to load repositories.');
+    }
+  });
 
   // === CONTACT FORM ===
-  function handleForm(e) {
+  async function handleForm(e) {
     e.preventDefault();
-    const btn = document.getElementById('form-submit-btn');
-    const status = document.getElementById('form-status');
-    const form = document.getElementById('contact-form');
+    const btn = byId('form-submit-btn');
+    const status = byId('form-status');
+    const form = byId('contact-form');
+    if (!btn || !status || !form) return;
     btn.disabled = true;
     btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Sending...';
     status.style.display = 'none';
-    lucide.createIcons();
+    renderIcons();
 
-    fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: {'Accept': 'application/json'}
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        status.textContent = '✓ Message sent successfully!';
-        status.style.color = '#34d399';
+    function show(message, color) {
+      status.textContent = message;
+      status.style.color = color;
+      status.style.display = 'block';
+    }
+
+    try {
+      const data = await fetchJSON(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {'Accept': 'application/json'},
+        timeout: 15000
+      });
+      if (data.success === true || data.success === 'true') {
+        show('✓ Message sent successfully!', '#34d399');
         form.reset();
       } else {
-        status.textContent = '✗ Failed to send. Email me directly instead.';
-        status.style.color = '#f87171';
+        logError('contact form rejected by provider', new Error(data.message || 'no success flag in response'));
+        show('✗ Failed to send. Email me directly instead.', '#f87171');
       }
-      status.style.display = 'block';
-    })
-    .catch(() => {
-      status.textContent = '✗ Network error. Please email me directly.';
-      status.style.color = '#f87171';
-      status.style.display = 'block';
-    })
-    .finally(() => {
+    } catch (err) {
+      logError('contact form submission failed', err);
+      show('✗ Could not reach the mail service. Please email me directly.', '#f87171');
+    } finally {
       btn.disabled = false;
       btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Send Message';
-      lucide.createIcons();
+      renderIcons();
       setTimeout(() => { status.style.display = 'none'; }, 5000);
-    });
+    }
   }
 
   // Click outside to close accent picker
   document.addEventListener('click', function(e) {
     const picker = document.getElementById('accent-picker');
     const btn = document.getElementById('accent-btn');
+    if (!picker || !btn) return;
     if (!picker.classList.contains('hidden') && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
       picker.classList.add('hidden');
     }
